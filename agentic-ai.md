@@ -668,19 +668,19 @@ To truly grasp Agentic AI, delving into resources from leading companies, educat
     *   **Source:** YouTube (from a reputable AI channel, presumably Fiddler AI)
     *   **Date:** August 14, 2025
     *   **Description:** This video offers crucial insights from real-world production deployments, discussing common failure points, the inadequacy of traditional evaluations for non-deterministic agents, and practical strategies for diagnosing failures by tracing the agent's full logic chain. It's excellent for understanding the practical challenges and best practices in agent development.
-    *   **Link:** [https://www.youtube.com/watch?v=wz-kL-W74kY](https://www.youtube.com/watch?v=wz-kL-W74kY) (based on snippet)
+    *   **Link:** [https://www.youtube.com/watch?v=_DNMRug6wDc](https://www.youtube.com/watch?v=_DNMRug6wDc) (based on snippet)
 
 2.  **Agentic AI Explained So Anyone Can Get It!**
     *   **Source:** YouTube (ByteMonk)
     *   **Date:** June 18, 2025
     *   **Description:** A highly accessible explanation of Agentic AI, detailing how it moves beyond prompts to act, learn, and evolve. It covers the core "Perceive, Reason, Act, Learn" loop, modern agent architecture, and introduces tools like LangChain and OpenAI's Agent SDK, as well as the Model Context Protocol (MCP).
-    *   **Link:** [https://www.youtube.com/watch?v=R0sS-I9rV6c](https://www.youtube.com/watch?v=R0sS-I9rV6c) (based on snippet)
+    *   **Link:** [https://www.youtube.com/watch?v=Jj1-zb38Yfw](https://www.youtube.com/watch?v=Jj1-zb38Yfw)
 
 3.  **Start Building AI Agents: Core Concepts for Developers**
     *   **Source:** YouTube
     *   **Date:** August 22, 2025
     *   **Description:** This livestream provides foundational knowledge for developers interested in building AI agents. It clarifies what AI agents are, when to use them, and their differences from traditional automation, focusing on planning, reasoning, and autonomous decision-making with practical tips.
-    *   **Link:** [https://www.youtube.com/watch?v=rUjXoXg4W6g](https://www.youtube.com/watch?v=rUjXoXg4W6g) (based on snippet)
+    *   **Link:** [https://www.youtube.com/watch?v=zqulxdcPZLk](https://www.youtube.com/watch?v=zqulxdcPZLk)
 
 #### **Online Courses (Comprehensive & Practical)**
 
@@ -694,7 +694,7 @@ To truly grasp Agentic AI, delving into resources from leading companies, educat
     *   **Source:** Coursera (Vanderbilt University)
     *   **Date:** Updated for 2025
     *   **Description:** Taught by Dr. Jules White, a renowned AI expert, this beginner-level specialization focuses on building autonomous AI agents using Python, mastering agent loops, tool integration, and multi-agent collaboration. It emphasizes optimizing agents for real-world applications.,
-    *   **Link:** [https://www.coursera.org/specializations/ai-agents-agentic-ai-python](https://www.coursera.org/specializations/ai-agents-agentic-ai-python) (based on snippet)
+    *   **Link:** [https://www.coursera.org/specializations/ai-agents-python](https://www.coursera.org/specializations/ai-agents-python) (based on snippet)
 
 #### **Official Documentation / Authoritative Guides**
 
@@ -714,7 +714,7 @@ To truly grasp Agentic AI, delving into resources from leading companies, educat
     *   **Source:** LlamaIndex Official Documentation,
     *   **Date:** Continuously updated (AgentWorkflow introduced Jan 22, 2025)
     *   **Description:** LlamaIndex offers robust abstractions for building agentic systems, particularly for context-augmented LLM applications. Their documentation covers core agent components, tool use, query planning, and the new AgentWorkflow system for building and orchestrating multi-agent systems with state management and human-in-the-loop capabilities.,
-    *   **Link:** [https://docs.llamaindex.ai/en/stable/understanding/agent/agents.html](https://docs.llamaindex.ai/en/stable/understanding/agent/agents.html) (Direct link to Agents section)
+    *   **Link:** [https://docs.llamaindex.ai/en/stable/](https://docs.llamaindex.ai/en/stable/)
 
 #### **Well-known Technology Blogs & Industry Updates**
 
@@ -725,10 +725,10 @@ To truly grasp Agentic AI, delving into resources from leading companies, educat
     *   **Link:** [https://blogs.microsoft.com/](https://blogs.microsoft.com/) (Explore AI-related posts, specifically around "Build 2025" and "Agentic AI")
 
 10. **Google AI Blog / The Keyword: Advancements in Agentic AI (Gemini 2.0, Project Astra)**
-    *   **Source:** Google AI Blog / The Keyword,
+    *   **Source:** Google AI Blog,
     *   **Date:** December 2024 - January 2025,
     *   **Description:** Google's significant push into Agentic AI with Gemini 2.0 marks a move toward the "agentic era." Announcements include experimental models like Gemini 2.0 Flash, Project Astra (a universal AI assistant with multi-modal understanding), Project Mariner (acting in Chrome), and Jules (an AI-powered code agent). This reflects Google's strategic focus on building helpful AI agents across various domains.,
-    *   **Link:** [https://ai.googleblog.com/](https://ai.googleblog.com/) or [https://blog.google/the-keyword/](https://blog.google/the-keyword/) (Explore posts from late 2024 and early 2025 on Gemini and AI Agents)
+    *   **Link:** [https://ai.googleblog.com/](https://ai.googleblog.com/) (Explore posts from late 2024 and early 2025 on Gemini and AI Agents)
 
 ### People Worth Following
 As a technology journalist deeply embedded in the ever-evolving AI landscape, I've seen Agentic AI emerge as a truly transformative force. Moving beyond simple reactive systems, these autonomous, goal-driven entities are reshaping how we approach complex problem-solving across industries. Identifying the key figures driving this paradigm shift is crucial for anyone looking to stay ahead.
@@ -746,53 +746,44 @@ Here are the top 10 most prominent and influential individuals in Agentic AI, fr
 ### **2. Jensen Huang**
 **Role:** Founder and CEO, NVIDIA
 **Influence:** As the head of NVIDIA, Huang is at the epicenter of providing the foundational hardware (GPUs) and software platforms crucial for accelerating the development and deployment of sophisticated AI agents. He frequently highlights the evolving role of IT in managing these new digital workforces.
-*   **LinkedIn:** [https://www.linkedin.com/in/jensen-huang-96a9277/](https://www.linkedin.com/in/jensen-huang-96a9277/)
-*   **Twitter/X:** [@JensenHuangNVD](https://twitter.com/JensenHuangNVD)
+*   **LinkedIn:** [https://www.linkedin.com/in/jenhsunhuang/](https://www.linkedin.com/in/jenhsunhuang/)
 
 ### **3. Dario Amodei**
 **Role:** CEO and Co-founder, Anthropic
 **Influence:** Amodei leads Anthropic, a key player in developing safe and ethical AI, including advanced agentic systems like Claude. His work and public statements often focus on responsible AI scaling and the profound societal implications of highly capable AI agents.
-*   **LinkedIn:** [https://www.linkedin.com/in/dario-amodei-16982025/](https://www.linkedin.com/in/dario-amodei-16982025/)
-*   **Twitter/X:** [@DarioAmodei](https://twitter.com/DarioAmodei)
+*   **LinkedIn:** [https://www.linkedin.com/in/dario-amodei-3934934/](https://www.linkedin.com/in/dario-amodei-3934934/)
 
 ### **4. Marc Benioff**
 **Role:** Chairman and CEO, Salesforce
 **Influence:** Benioff champions Agentic AI as a "new labor model, new productivity model, and a new economic model." Salesforce's "Agentforce" platform is transforming CRM by deploying role-based AI agents to automate tasks, personalize customer interactions, and improve efficiency across various business functions.
 *   **LinkedIn:** [https://www.linkedin.com/in/marcbenioff/](https://www.linkedin.com/in/marcbenioff/)
-*   **Twitter/X:** [@Benioff](https://twitter.com/Benioff)
 
 ### **5. Joao Moura**
 **Role:** Founder and CEO, CrewAI
 **Influence:** Moura is the driving force behind CrewAI, a rapidly growing open-source framework for orchestrating collaborative, role-playing autonomous AI agents. He is a prominent voice in the multi-agent systems space, emphasizing simplicity, flexibility, and robust control for production-ready AI automations.
 *   **LinkedIn:** [https://www.linkedin.com/in/joaomdmoura/](https://www.linkedin.com/in/joaomdmoura/)
-*   **Twitter/X:** [@joaomdmoura](https://x.com/joaomdmoura)
 
 ### **6. Toran Bruce Richards**
 **Role:** Founder, Auto-GPT
 **Influence:** Richards created Auto-GPT, an influential open-source project that showcases autonomous AI agents capable of achieving defined goals with minimal human intervention. His work highlights goal-oriented planning and autonomous execution, sparking widespread developer interest in AI agents.
-*   **LinkedIn:** [https://www.linkedin.com/in/toran-bruce-richards-65b1b110a/](https://www.linkedin.com/in/toran-bruce-richards-65b1b110a/) (Based on OpenUK reference to his LinkedIn)
-*   **Twitter/X:** [@ToranBruce](https://twitter.com/ToranBruce) (Based on OpenUK reference to his Twitter)
+*   **LinkedIn:** [https://www.linkedin.com/in/toran-richards/?originalSubdomain=uk](https://www.linkedin.com/in/toran-richards/?originalSubdomain=uk)
 
 ### **7. Parag Agrawal**
 **Role:** Founder and CEO, Parallel Web Systems Inc. (formerly CEO of Twitter)
 **Influence:** After his tenure at Twitter, Agrawal launched Parallel Web Systems Inc., an AI startup focused on "rebuilding the internet for AI agents." His venture aims to empower AI systems to autonomously collect and analyze information from the web at scale, offering "Deep Research API" that claims to outperform existing models.
-*   **LinkedIn:** [https://www.linkedin.com/in/paraga/](https://www.linkedin.com/in/paraga/)
-*   **Twitter/X:** [@paraga](https://twitter.com/paraga)
+*   **LinkedIn:** [https://www.linkedin.com/in/paragagr/](https://www.linkedin.com/in/paragagr/)
 
 ### **8. Sinan Aral**
 **Role:** David Austin Professor of Management, IT, Marketing and Data Science at MIT; Director of the MIT Initiative on the Digital Economy (IDE)
 **Influence:** Aral is a leading academic researching the societal implications and practical applications of AI agents. His work at MIT explores human-AI collaboration, agent negotiation, and the fundamental shift towards the "Agentic Age" of AI.
-*   **LinkedIn:** [https://www.linkedin.com/in/sinanaral/](https://www.linkedin.com/in/sinanaral/)
-*   **Twitter/X:** [@sinanaral](https://twitter.com/sinanaral)
+*   **LinkedIn:** [https://www.linkedin.com/in/sinan-aral-3964a7/](https://www.linkedin.com/in/sinan-aral-3964a7/)
 
 ### **9. Noelle Russell**
 **Role:** CEO, AI Leadership Institute; Global AI Solutions Lead, Generative AI and LLM Industry Lead, Accenture
 **Influence:** A multi-award-winning technologist, Russell bridges the gap between cutting-edge AI and responsible innovation. She is a prominent voice on LinkedIn, discussing how Agentic AI transforms enterprise workflows and customer experiences, with a strong emphasis on ethics and accountability.
 *   **LinkedIn:** [https://www.linkedin.com/in/noelleai/](https://www.linkedin.com/in/noelleai/)
-*   **Twitter/X:** [@NoelleRussell_](https://x.com/NoelleRussell_)
 
 ### **10. Charles Lamanna**
 **Role:** Corporate Vice President, Business Applications and Platforms, Microsoft
 **Influence:** Lamanna is a key leader at Microsoft, driving the integration of AI agents into business applications and low-code platforms. He articulates a bold vision for an "agent-native enterprise" where AI agents will fundamentally reshape traditional business software and workflows by 2030.
-*   **LinkedIn:** [https://www.linkedin.com/in/clamanna/](https://www.linkedin.com/in/clamanna/)
-*   **Twitter/X:** [@charleslamanna](https://twitter.com/charleslamanna)
+*   **LinkedIn:** [https://www.linkedin.com/in/charleslamanna/](https://www.linkedin.com/in/charleslamanna/)
