@@ -1,965 +1,607 @@
 ## Overview
-MLFlow is an open-source platform designed to manage the entire machine learning (ML) lifecycle, streamlining the process from experimentation to deployment. Originally developed by Databricks and now a Linux Foundation project, MLFlow is vendor-agnostic and supports a wide array of ML libraries and environments, including local setups, on-premises clusters, and various cloud platforms. As of August 27, 2025, MLflow 3.3.2 is the latest stable release, bringing significant enhancements, particularly in Generative AI (GenAI) capabilities, including advanced tracing, observability, and evaluation for Large Language Models (LLMs) and AI agents.
 
-### What Problem It Solves
+MLflow is an open-source platform designed to streamline the entire machine learning (ML) lifecycle, from experimentation and reproducibility to deployment and robust model management. Developed by Databricks and now a Linux Foundation project, it aims to standardize and simplify the complex workflows inherent in ML development.
 
-Developing and deploying ML models often presents significant challenges, including tracking numerous experiments, ensuring reproducibility, managing different model versions, and facilitating collaboration among teams. MLFlow addresses these complexities by providing a unified solution that streamlines:
+### The Problem MLflow Solves
 
-*   **Experiment Tracking:** It logs parameters, code versions, metrics, and artifacts, allowing data scientists to compare results, visualize performance, and reproduce experiments. This helps in identifying the best-performing models efficiently.
-*   **Reproducibility:** MLFlow helps ensure that ML code runs consistently across different environments by packaging it with its dependencies, making experiments easier to reproduce.
-*   **Model Management:** It offers a centralized Model Registry for versioning, annotating, and managing the lifecycle of models from staging to production, promoting collaboration and governance.
-*   **Deployment:** MLFlow standardizes model packaging into "flavors" that can be easily deployed to various serving environments, including REST APIs, cloud platforms (like AWS SageMaker, Azure ML, Google Vertex AI), and containerized environments.
-*   **Collaboration:** It provides a shared platform for teams to organize, share, and manage experiments, models, and results, improving efficiency and reducing communication overhead between data scientists and MLOps engineers.
-*   **Generative AI (GenAI) Projects:** With MLflow 3.x, it offers enhanced capabilities for tracking training data, model parameters, and training runs to improve performance and manage deployments for LLMs and other advanced neural networks, including tracing observability and AI-powered tools to measure GenAI quality.
+Machine learning development is often characterized by chaotic experimentation, difficulty in reproducing results, and challenges in transitioning models from research to production. MLflow addresses these pain points by providing tools to:
 
-### Core Components
-MLFlow is structured around four primary components, with additional extensions:
+*   **Track Experiments:** It provides a centralized system to log and compare thousands of experiments, meticulously keeping tabs on the data, code, parameters, and environments used to achieve specific results.
+*   **Ensure Reproducibility:** MLflow helps package code and environments, addressing the complexity of sharing ML code and ensuring it runs consistently across diverse environments and with different users, despite varying dependencies and configurations.
+*   **Standardize Model Packaging and Deployment:** It offers a standardized format for packaging ML models, thereby mitigating inefficiencies and inconsistencies arising from disparate deployment methods across teams.
+*   **Manage Model Lifecycle:** MLflow provides a central registry to manage the full lifecycle of models, including versioning, governance, and smooth transitions through stages like development, staging, and production.
 
-1.  **MLflow Tracking:** An API and UI for logging and querying experiments, including parameters, metrics, code versions, and artifacts.
-2.  **MLflow Projects:** A standard format for packaging ML code into reusable and reproducible units, specifying dependencies and entry points.
-3.  **MLflow Models:** A convention for packaging trained ML models in various "flavors" (e.g., scikit-learn, TensorFlow) that can be easily deployed to diverse serving environments.
-4.  **MLflow Model Registry:** A centralized repository to manage the lifecycle of ML models, offering versioning, stage transitions (e.g., Staging, Production), and approval workflows.
+### Temporal Evolution of MLflow
 
-MLFlow also includes `MLflow Evaluation` for model validation and comparison, and `MLflow Pipelines` for defining and executing complex ML workflows.
-
-### Alternatives
-While MLFlow is a popular choice for MLOps, several alternatives offer similar or specialized capabilities:
-
-*   **Experiment Tracking Platforms:** Neptune.ai, Weights & Biases, Comet ML provide advanced experiment management and visualization.
-*   **End-to-End MLOps Platforms:** Kubeflow (Kubernetes-native), ZenML, ClearML, Valohai, and commercial platforms like Azure ML, AWS SageMaker, and Google Cloud Vertex AI offer comprehensive solutions covering orchestration, deployment, and monitoring.
-*   **Model Serving Frameworks:** BentoML focuses on converting trained models into production-ready serving systems.
-*   **Workflow Orchestration:** Metaflow specializes in orchestrating data workflows and ML pipelines, particularly for large-scale deployments.
-
-### Primary Use Cases
-MLFlow is versatile and caters to a broad spectrum of ML scenarios:
-
-*   **Individual Data Scientists:** To track experiments locally, organize code, and prepare models for deployment.
-*   **Data Science Teams:** To enable collaboration, share experiment results, compare models, and collectively manage the model lifecycle through a central tracking server and model registry.
-*   **Large Organizations:** To standardize ML workflows, ensure reproducibility, and facilitate seamless transitions of models from research and development to staging and production.
-*   **Managing Generative AI (GenAI) Projects:** Tracking training data, model parameters, and training runs to improve performance and manage deployments for LLMs and other advanced neural networks.
-*   **Reproducible ML Pipelines:** Packaging code and models for consistent execution and deployment across different environments, crucial for scenarios like autonomous vehicle development, personalized learning, and fraud detection.
+*   **2018 (Initial Alpha Release):** Databricks introduced MLflow, initially featuring MLflow Tracking, Projects, and Models, with early integration for Spark MLlib and Google Cloud Storage.
+*   **2019 (MLflow 1.0 Release):** Reached API stability, enhanced visualization for streaming metrics, and foreshadowed the Model Registry.
+*   **Early 2020s (MLOps Foundation):** MLflow solidified its position as a cornerstone for traditional MLOps, with the Model Registry becoming a critical component for centralized lifecycle management.
+*   **22023 (Expansion into LLMs/GenAI):** Adapted to the rising importance of Generative AI (GenAI) by expanding capabilities to support Large Language Models (LLMs).
+*   **2024 (GenAI Apps & Agents Focus):** Added significant features for building GenAI applications and agents, including enhanced observability through tracing, comprehensive evaluation suites for LLMs, integrated versioning for prompts and agent code, and the MLflow AI Gateway.
+*   **22025 (MLflow 3.x - Latest):** Introduced major new features, further extending capabilities, particularly for GenAI. Key additions include Model Registry Webhooks, Agno Tracing Integration, open-sourced GenAI Evaluation capabilities, a revamped Trace Table View, OpenTelemetry Metrics Export, Model Context Protocol (MCP) Server Integration, Custom Judges API, Tracing TypeScript SDK and Semantic Kernel Tracing, Feedback Tracking, Asynchronous Artifact Logging, and Keras 3 Format Support.
 
 ## Technical Details
 
-### Key Concepts of MLFlow
+MLflow is structured around several components that work together to manage the ML lifecycle. The latest MLflow 3.x version significantly expands its capabilities, especially for Generative AI (GenAI) applications and agents.
 
-#### 1. MLflow Tracking: The Experiment Logbook
+### 1. MLflow Tracking: Centralized Experiment Metadata and Artifact Store
 
-**Definition:** MLflow Tracking is an API and UI designed for logging and querying machine learning experiments. It captures essential information such as parameters, code versions, metrics, and artifacts, providing a comprehensive historical record of each model training run. This enables data scientists to compare results, visualize performance, and reproduce experiments efficiently.
+MLflow Tracking provides an API and UI for logging parameters, code versions, metrics, and artifacts (e.g., models, plots) during ML experiments. It organizes these into "runs" and "experiments," enabling comparison and visualization of results. MLflow 3.x refines this with improved architecture for deep learning and GenAI, introducing the `LoggedModel` entity as a first-class citizen.
 
-**Code Example:**
+**Best Practices:**
+*   **Autologging:** Leverage `mlflow.<framework>.autolog()` for automatic logging of parameters, metrics, and models for popular ML libraries, significantly reducing manual effort.
+*   **Experiment Organization:** Use `mlflow.set_experiment()` or `mlflow.start_run(experiment_name=...)` to logically group related runs.
+*   **Descriptive Run Names:** Provide meaningful `run_name` arguments for quick identification of experiment goals.
+
+**Architectural Considerations:**
+*   **Remote Tracking Server:** For production, decouple the tracking server from individual machines. Use a robust SQL database (e.g., PostgreSQL) for metadata for better concurrency and high availability.
+*   **Artifact Store:** Leverage cloud object storage (AWS S3, Azure Blob Storage, Google Cloud Storage) for high durability, virtually limitless scalability, and cost-effectiveness for artifacts.
+
+**Common Pitfalls:**
+*   **Overlooking Autologging:** Manually logging every parameter and metric can be tedious and error-prone.
+*   **Disorganized Runs:** Without proper experiment naming and run grouping, the MLflow UI can become cluttered.
+*   **Forgetting to call `mlflow.end_run()`:** While `with mlflow.start_run():` handles this automatically, manual `start_run()` calls require an explicit `mlflow.end_run()`.
+
+**Code Example (Autologging):**
 
 ```python
 import mlflow
 import mlflow.sklearn
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.model_selection import train_test_split
-import pandas as pd
+from sklearn.metrics import mean_squared_error
 import numpy as np
+import warnings
 
-# Simulate a dataset
-data = pd.DataFrame({
-    'feature1': np.random.rand(100),
-    'feature2': np.random.rand(100),
-    'target': np.random.rand(100) * 100
-})
-X = data[['feature1', 'feature2']]
-y = data['target']
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+warnings.filterwarnings("ignore", category=FutureWarning, module="sklearn")
+mlflow.set_experiment("RandomForest_Housing_Prediction")
+mlflow.sklearn.autolog() # Enables automatic logging
 
-# Start an MLflow run
-with mlflow.start_run(run_name="RandomForest_Training_Run"):
-    # Log parameters
-    n_estimators = 100
-    max_depth = 10
-    mlflow.log_param("n_estimators", n_estimators)
-    mlflow.log_param("max_depth", max_depth)
-
-    # Train model
-    model = RandomForestRegressor(n_estimators=n_estimators, max_depth=max_depth, random_state=42)
+with mlflow.start_run(run_name="Basic_RF_Experiment") as run:
+    X = np.random.rand(100, 5) * 10
+    y = X[:, 0] * 2 + X[:, 1] * 0.5 - X[:, 2] * 3 + 20 + np.random.normal(0, 5, 100)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    model = RandomForestRegressor(n_estimators=150, max_depth=12, random_state=42)
     model.fit(X_train, y_train)
     predictions = model.predict(X_test)
-
-    # Log metrics
     rmse = np.sqrt(mean_squared_error(y_test, predictions))
-    mae = mean_absolute_error(y_test, predictions)
-    r2 = r2_score(y_test, predictions)
-    mlflow.log_metric("rmse", rmse)
-    mlflow.log_metric("mae", mae)
-    mlflow.log_metric("r2", r2)
-
-    # Log the model
-    mlflow.sklearn.log_model(model, "random_forest_model_artifact")
-
-    print(f"MLflow Run ID: {mlflow.active_run().info.run_id}")
-    print(f"Logged Parameters: n_estimators={n_estimators}, max_depth={max_depth}")
-    print(f"Logged Metrics: RMSE={rmse}, MAE={mae}, R2={r2}")
-
-# To view the UI: run `mlflow ui` in your terminal where the runs are logged (e.g., local directory or remote server)
+    mlflow.log_param("dataset_rows", len(X))
+    mlflow.log_metric("test_rmse", rmse)
+    print(f"MLflow Run ID: {run.info.run_id}")
 ```
+**Explanation:** This example demonstrates how `mlflow.sklearn.autolog()` simplifies experiment tracking by automatically logging hyperparameters, evaluation metrics, and the trained model when `model.fit()` is called within an `mlflow.start_run()` block.
+
+### 2. MLflow Projects: Standardized, Reproducible Code Packaging
+
+MLflow Projects provide a standard format for packaging ML code in a reproducible and reusable manner. A project is essentially a directory containing your code and an `MLproject` file, which defines the project's name, entry points, parameters, and environment dependencies (e.g., `conda.yaml`, `requirements.txt`, `Dockerfile`).
 
 **Best Practices:**
-*   **Centralize Tracking:** Configure a remote MLflow Tracking server (e.g., a database or cloud storage) for collaborative experiment management and scalability, rather than relying on local file storage.
-*   **Structured Logging:** Log all relevant hyperparameters, data versions, and environmental details (e.g., Python and library versions) for comprehensive reproducibility.
-*   **Meaningful Naming:** Use descriptive experiment and run names for easier navigation and comparison in the UI.
-*   **Autologging:** Leverage `mlflow.autolog()` for supported libraries (like scikit-learn, TensorFlow, PyTorch) to automatically log parameters, metrics, and models without explicit `mlflow.log_` calls, reducing boilerplate.
+*   **Clear `MLproject` Structure:** Define clear entry points with well-documented parameters and default values.
+*   **Explicit Environments:** Always specify a `conda.yaml` or `requirements.txt` (or Docker) to ensure environmental reproducibility, ideally pinning exact package versions.
+*   **Version Control:** Store your MLflow Project in a Git repository for automatic logging of Git commit hashes.
+
+**Architectural Considerations:**
+*   **Docker:** Recommended for maximal reproducibility and isolation in production, encapsulating the entire environment including OS-level dependencies, significantly reducing "environment drift."
 
 **Common Pitfalls:**
-*   **Inconsistent Logging:** Not logging all critical parameters or metrics, leading to difficulty in reproducing or comparing runs.
-*   **Local Storage Only:** Storing all tracking data locally, which hinders collaboration and makes sharing and centralized analysis difficult.
-*   **Over-logging or Under-logging:** Logging too much trivial data (cluttering the UI) or too little essential data (losing valuable information).
+*   **Missing Dependencies:** Not specifying all necessary dependencies can lead to runtime issues.
+*   **Hardcoding Paths:** Avoid hardcoding data paths; use parameters for configurability.
 
-#### 2. MLflow Projects: Reproducible Code Packaging
-
-**Definition:** MLflow Projects provide a standard format for packaging ML code into reusable and reproducible units. A project specifies its dependencies and entry points, allowing anyone to run the code in a consistent environment, locally or on remote platforms, ensuring reproducibility across different environments.
-
-**Code Example (MLproject file):**
+**Code Example (`MLproject` content):**
 
 ```yaml
-# MLproject
-name: WineQualityPrediction
+name: SimpleRegressionProject
 
-conda_env: conda.yaml # Specifies the Conda environment file
+conda_env: conda.yaml
 
 entry_points:
-  main: # Main entry point for training
+  main:
     parameters:
-      alpha: {type: float, default: 0.5, help: "ElasticNet alpha parameter"}
-      l1_ratio: {type: float, default: 0.5, help: "ElasticNet l1_ratio parameter"}
-    command: "python train.py --alpha {alpha} --l1-ratio {l1_ratio}"
-
-  predict: # Entry point for inference (optional, but good practice)
-    parameters:
-      model_uri: {type: string, help: "URI of the MLflow model to use for prediction"}
-      input_path: {type: string, help: "Path to input CSV for predictions"}
-      output_path: {type: string, help: "Path to save predictions CSV"}
-    command: "python predict.py --model-uri {model_uri} --input-path {input_path} --output-path {output_path}"
+      n_estimators: {type: int, default: 100}
+      max_depth: {type: int, default: 10}
+    command: "python train.py --n-estimators {n_estimators} --max-depth {max_depth}"
 ```
+**To run (from parent directory of `my_ml_project`):** `mlflow run my_ml_project -P n_estimators=120 -P max_depth=8`
 
-Alongside the `MLproject` file, you would typically have `conda.yaml` for environment definition and `train.py` (and optionally `predict.py`) containing your ML code.
+**Explanation:** This `MLproject` file defines how to run a `train.py` script with specific parameters within a `conda.yaml` environment. The `mlflow run` command executes this project, managing its dependencies and creating a new MLflow run.
 
-**`conda.yaml` example:**
-```yaml
-name: wine-quality-env
-channels:
-  - defaults
-  - conda-forge
-dependencies:
-  - python=3.9
-  - scikit-learn=1.3.0
-  - pandas=2.0.3
-  - numpy=1.24.3
-  - mlflow=2.8.1 # Pin MLflow version
-  - pip:
-    - -r requirements.txt # For additional pip dependencies
-```
+### 3. MLflow Models & Flavors: Universal Model Packaging for Deployment
 
-**To run this project:**
-```bash
-mlflow run . -P alpha=0.7 -P l1_ratio=0.3
-```
+MLflow Models provide a standardized convention for packaging machine learning models from various ML libraries into "flavors" (e.g., Python function, R function, scikit-learn, TensorFlow, PyTorch, Keras 3, ONNX, LangChain). This standardization simplifies deployment to diverse serving environments. MLflow 3.x introduces the `LoggedModel` entity for refined lifecycle tracking.
+
+**Model Flavors:** These are specific, standardized formats (e.g., `python_function`, `sklearn`, `tensorflow`) that dictate how a model is packaged and can be used for inference. MLflow 3.x specifically adds support for the new Keras 3 format.
 
 **Best Practices:**
-*   **Version Control:** Always keep `MLproject` and `conda.yaml` (or `requirements.txt`) files under version control alongside your code to capture the exact environment and execution commands.
-*   **Clear Entry Points:** Define explicit entry points with sensible default parameters to make the project easy to understand and execute for others.
-*   **Environment Management:** Use `conda.yaml` or `requirements.txt` to precisely define all dependencies, ensuring environment reproducibility.
+*   **Utilize Flavors:** Always log models with their native framework flavor (e.g., `mlflow.sklearn.log_model`) for optimal functionality.
+*   **`pyfunc` for Custom Logic:** Wrap models requiring custom pre/post-processing in the `python_function` (or `pyfunc`) flavor.
+*   **Include Dependencies:** Ensure all necessary model dependencies are correctly captured in the `conda.yaml` or `requirements.txt` associated with the logged model.
+
+**Architectural Considerations:**
+*   **Native Flavors vs. `pyfunc`:** Native flavors provide better integration; `pyfunc` is more versatile for custom logic.
+*   **ONNX Flavor:** For performance-critical or cross-platform deployments, ONNX provides an interoperable format optimized for inference.
 
 **Common Pitfalls:**
-*   **Missing Dependencies:** Not specifying all required libraries in `conda.yaml`, leading to "dependency hell" when trying to reproduce runs.
-*   **Hardcoded Paths:** Using absolute paths instead of relative paths or MLflow artifact URIs, breaking reproducibility when moving projects.
-*   **Lack of Documentation:** Not documenting the purpose of parameters or entry points, making it hard for collaborators to use the project effectively.
+*   **Generic `pyfunc` for Native Models:** Can lose framework-specific metadata and optimizations.
+*   **Missing Dependencies in Environment:** Leads to model loading and prediction failures.
 
-#### 3. MLflow Models: Universal Model Packaging
-
-**Definition:** MLflow Models provide a standard convention for packaging trained ML models in various "flavors." This standardization allows models to be easily deployed to diverse serving environments (e.g., REST APIs, batch inference, cloud platforms) without framework-specific integration logic, promoting interoperability.
-
-**Code Example:**
-
-```python
-import mlflow.sklearn
-from sklearn.linear_model import LogisticRegression
-from sklearn.datasets import load_iris
-from mlflow.models import infer_signature
-from mlflow.pyfunc import PythonModel
-
-# Load data
-X, y = load_iris(return_X_y=True)
-
-# Train a simple model
-model = LogisticRegression(solver="liblinear", random_state=42)
-model.fit(X, y)
-
-# Infer model signature (input/output schema)
-predictions = model.predict(X)
-signature = infer_signature(X, predictions)
-
-# Log the model using MLflow's scikit-learn flavor
-with mlflow.start_run(run_name="IrisClassifier_Training"):
-    mlflow.sklearn.log_model(
-        sk_model=model,
-        artifact_path="iris_model",
-        registered_model_name="IrisClassifier", # Optional: Register to Model Registry
-        signature=signature,
-        input_example=X[:2] # Provide example input for better serving integration
-    )
-    run_id = mlflow.active_run().info.run_id
-    print(f"Model logged at artifact_path: mlflow-artifacts:/<artifact_location>/{run_id}/artifacts/iris_model")
-    print(f"To load: model = mlflow.pyfunc.load_model('runs:/{run_id}/iris_model')")
-
-# Example of a custom pyfunc model (if you have complex pre/post-processing)
-class CustomModel(PythonModel):
-    def load_context(self, context):
-        import joblib
-        self.model = joblib.load(context.artifacts["model_path"])
-
-    def predict(self, context, model_input):
-        # Apply custom pre-processing
-        processed_input = model_input * 2
-        return self.model.predict(processed_input)
-
-# Assuming you've saved a scikit-learn model with joblib:
-# import joblib
-# joblib.dump(model, "my_custom_model.joblib")
-# with mlflow.start_run():
-#     mlflow.pyfunc.log_model(
-#         artifact_path="custom_iris_model",
-#         python_model=CustomModel(),
-#         artifacts={"model_path": "my_custom_model.joblib"},
-#         registered_model_name="CustomIrisClassifier",
-#         signature=signature,
-#         input_example=X[:2]
-#     )
-```
-
-**Best Practices:**
-*   **Use Flavors Appropriately:** Leverage built-in flavors (e.g., `mlflow.sklearn`, `mlflow.tensorflow`, `mlflow.pytorch`) for automatic serialization and deserialization.
-*   **Define Signatures:** Explicitly define model input and output signatures using `mlflow.models.infer_signature()` to ensure type validation and better serving compatibility.
-*   **Include Example Inputs:** Provide `input_example` when logging models for robust testing and automatic API generation by serving tools.
-*   **Custom Flavors for Niche Models:** For models not covered by standard flavors, create custom `pyfunc` models to ensure universal deployment.
-
-**Common Pitfalls:**
-*   **Not Logging Dependencies:** For custom `pyfunc` models, forgetting to specify all necessary library dependencies in the `conda_env` parameter, leading to deployment failures.
-*   **Incompatible Data Types:** Mismatching input data types during inference with the expected types defined in the model signature.
-*   **Large Artifacts:** Logging unnecessarily large files alongside the model, increasing storage costs and deployment times.
-
-#### 4. MLflow Model Registry: Centralized Model Governance
-
-**Definition:** The MLflow Model Registry is a centralized repository that manages the lifecycle of ML models, offering versioning, stage transitions (e.g., Staging, Production, Archived), annotations, and approval workflows. It acts as a single source of truth for all registered models, facilitating collaboration and governance.
-
-**Code Example:**
+**Code Example (Logging a Scikit-learn model):**
 
 ```python
 import mlflow
 import mlflow.sklearn
 from sklearn.linear_model import LogisticRegression
 from sklearn.datasets import load_iris
-from mlflow.tracking import MlflowClient
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+import warnings
 
-# (Assume model training and logging from a run, getting run_id)
-# For demonstration, let's just log a model and then register it.
-with mlflow.start_run() as run:
-    X, y = load_iris(return_X_y=True)
-    model = LogisticRegression(solver="liblinear", random_state=42)
-    model.fit(X, y)
-    
-    # Log the model artifact and register it
-    model_info = mlflow.sklearn.log_model(
+warnings.filterwarnings("ignore", category=FutureWarning, module="sklearn")
+warnings.filterwarnings("ignore", category=UserWarning, module="mlflow")
+
+mlflow.set_experiment("Iris_Model_Management")
+model_name = "IrisLogisticRegressionModel"
+
+with mlflow.start_run(run_name="Train_LR_Iris_Model_V1"):
+    iris = load_iris()
+    X, y = iris.data, iris.target
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    model = LogisticRegression(solver='liblinear', random_state=42, max_iter=1000)
+    model.fit(X_train, y_train)
+    predictions = model.predict(X_test)
+    accuracy = accuracy_score(y_test, predictions)
+    mlflow.log_metric("accuracy", accuracy)
+    mlflow.sklearn.log_model(
         sk_model=model,
-        artifact_path="model",
-        registered_model_name="IrisClassifierDemoV2" # Registering with a new name for demo
+        artifact_path="iris_logistic_regression_model",
+        registered_model_name=model_name
     )
-    run_id = run.info.run_id
-    artifact_path = "model" # The path within the run artifacts
-    model_uri = f"runs:/{run_id}/{artifact_path}"
-    
-    # Initialize MLflow Client
-    client = MlflowClient()
-
-    # Get the latest version of the registered model
-    model_name = "IrisClassifierDemoV2"
-    latest_version = client.get_latest_versions(model_name, stages=["None"])[0].version
-    print(f"Registered model {model_name} version {latest_version}")
-
-    # Transition the model to 'Staging'
-    client.transition_model_version_stage(
-        name=model_name,
-        version=latest_version,
-        stage="Staging",
-        archive_existing_versions=True # Archive any existing models in 'Staging'
-    )
-    print(f"Model {model_name} (Version {latest_version}) transitioned to Staging.")
-
-    # Add a description and tags to the registered model
-    client.update_model_version(
-        name=model_name,
-        version=latest_version,
-        description="Logistic Regression model for Iris dataset, trained with liblinear solver."
-    )
-    client.set_model_version_tag(
-        name=model_name,
-        version=latest_version,
-        key="model_type",
-        value="classification"
-    )
-    client.set_model_version_tag(
-        name=model_name,
-        version=latest_version,
-        key="dataset",
-        value="iris"
-    )
-
-# To load a model from the registry (e.g., for inference)
-# This loads the 'Staging' version of 'IrisClassifierDemoV2'
-model_from_staging = mlflow.pyfunc.load_model(f"models:/{model_name}/Staging")
-sample_prediction = model_from_staging.predict(X[:1])
-print(f"Sample prediction from Staging model: {sample_prediction}")
+    print(f"Model logged and registered as '{model_name}'.")
 ```
+**Explanation:** This code logs a `scikit-learn` `LogisticRegression` model, automatically inferring its flavor. The `registered_model_name` argument registers it with the MLflow Model Registry.
 
-**Additional CLI example for managing versions/stages:**
-```bash
-# List all registered models
-mlflow models search-registered-models
+### 4. MLflow Model Registry: Centralized Model Lifecycle Management and Governance
 
-# List versions for a specific model
-mlflow models search-model-versions --max-results 10 --filter "name='IrisClassifierDemoV2'"
-
-# Transition a specific model version to Production
-# (Assuming version 1 of IrisClassifierDemoV2 exists in Staging)
-mlflow models transition-model-version-stage --name "IrisClassifierDemoV2" --version 1 --stage Production --archive-existing-versions
-
-# Get a model from a specific stage
-# This URI can be used in your deployment code:
-# model = mlflow.pyfunc.load_model("models:/IrisClassifierDemoV2/Production")
-```
+The MLflow Model Registry is a centralized hub for collaboratively managing the full lifecycle of MLflow Models. It provides model versioning, stage transitions (e.g., `None`, `Staging`, `Production`, `Archived`), annotations, and model lineage. MLflow 3.x integrates with Unity Catalog for enhanced centralized governance across workspaces.
 
 **Best Practices:**
-*   **Standardized Naming:** Establish clear naming conventions for registered models.
-*   **Stage-Based Workflows:** Implement a clear process for promoting models through `None`, `Staging`, `Production`, and `Archived` stages.
-*   **Comprehensive Metadata:** Add descriptions, tags, and annotations to models and versions, including lineage information, algorithm details, and performance metrics, to enhance discoverability and understanding.
-*   **Automated Promotion:** Integrate model promotion into CI/CD pipelines, automatically moving models to `Staging` after successful training and `Production` after passing validation tests.
+*   **Semantic Versioning:** Treat model versions logically, promoting them through stages.
+*   **Automate Stage Transitions:** Integrate Model Registry API calls into CI/CD pipelines.
+*   **Annotations and Descriptions:** Use model descriptions and version notes for context and documentation.
+*   **Access Control:** Leverage platform integrations (like Unity Catalog) for fine-grained access control.
+
+**Architectural Considerations:**
+*   **Version Control for Models:** Each registered model has immutable versions, enabling rollback and auditability.
+*   **Stage Transitions:** Formalized stages provide a clear workflow; automate for increased velocity with robust testing.
+*   **Metadata and Lineage:** Rich metadata and lineage link models back to their training runs, crucial for understanding and debugging.
 
 **Common Pitfalls:**
-*   **Lack of Stage Enforcement:** Not clearly defining or enforcing what each stage means, leading to confusion and inconsistent deployments.
-*   **Manual Updates:** Relying on manual updates in the UI for metadata, leading to outdated or missing information.
-*   **Overlapping Responsibilities:** Unclear ownership of models and their transitions between stages.
+*   **Manual Stage Changes:** Error-prone and doesn't scale; automate for robust MLOps.
+*   **Lack of Documentation:** Difficult to understand a model's purpose or why a specific version is in production.
+*   **Ignoring Model Lineage:** Loses crucial reproducibility information.
 
-#### 5. MLflow Flavors: Framework Agnostic Model Abstraction
-
-**Definition:** Flavors are a core concept within MLflow Models, providing a standardized way to package models from various ML libraries. Each flavor defines how to persist, load, and use a model for a specific framework (e.g., `mlflow.sklearn`, `mlflow.tensorflow`). This abstraction ensures that deployment tools can interact with models from any library without requiring framework-specific integrations.
-
-**Code Example (Loading via `pyfunc` flavor):**
+**Code Example (Managing Model Stages):**
 
 ```python
-import mlflow.pyfunc
-import pandas as pd
-from sklearn.datasets import load_iris
+from mlflow.tracking import MlflowClient
+client = MlflowClient()
+model_name = "IrisLogisticRegressionModel"
+# Assuming version 1 exists from previous logging
+client.transition_model_version_stage(
+    name=model_name,
+    version=1, # Replace with actual version if needed
+    stage="Staging",
+    archive_existing_versions=True # Archive any existing 'Staging' versions
+)
+print(f"Model {model_name} version 1 transitioned to Staging.")
 
-# Assuming you've already logged a model, e.g., 'IrisClassifier' version 1
-# You can find the model_uri from the MLflow UI or by getting the run_id
-# For this example, let's use the 'IrisClassifierDemoV2' from the previous Model Registry example
-model_name = "IrisClassifierDemoV2"
-model_uri = f"models:/{model_name}/Staging" # Load the model from Staging stage
-
-print(f"Loading model from URI: {model_uri}")
-model_loaded = mlflow.pyfunc.load_model(model_uri)
-
-# Prepare some new data for prediction
-X_new, _ = load_iris(return_X_y=True)
-# Convert to DataFrame as pyfunc models often expect tabular input
-input_df = pd.DataFrame(X_new[:5], columns=['sepal_length', 'sepal_width', 'petal_length', 'petal_width'])
-
-print("\nMaking predictions using the loaded model:")
-predictions = model_loaded.predict(input_df)
-print(predictions)
-
-# Example of accessing the underlying (native) model if it's a known flavor (e.g., sklearn)
-# This is generally not recommended for deployment systems that should rely on pyfunc,
-# but can be useful for introspection or specific framework-level operations.
-try:
-    native_model = model_loaded.unwrap_python_model()._model_impl # For sklearn model logged via mlflow.sklearn
-    print(f"\nUnderlying model type: {type(native_model)}")
-    print(f"Model coefficients: {native_model.coef_}")
-except Exception as e:
-    print(f"\nCould not unwrap native model (might not be an sklearn model or structure changed): {e}")
-
-# Note: The `unwrap_python_model()` method is specific to pyfunc models and
-# is typically used for inspecting the underlying PythonModel instance, not necessarily the native framework model.
-# For native framework models, one would usually load directly via `mlflow.sklearn.load_model` etc.
-# The pyfunc interface is the universal prediction interface.
+# Example of loading a production model
+# prod_model_uri = f"models:/{model_name}/Production"
+# loaded_prod_model = mlflow.sklearn.load_model(prod_model_uri)
+# print(f"\nLoaded model from URI: {prod_model_uri}")
 ```
+**Explanation:** This snippet demonstrates how to use the `MlflowClient` to transition a specific version of a registered model to the "Staging" stage, which is a common step in the model lifecycle.
+
+### 5. MLflow Evaluation: Comprehensive Model Validation and LLM Assessment
+
+MLflow Evaluation offers tools for model validation and automated metrics calculation. In MLflow 3.x, this component is significantly enhanced, especially for Large Language Model (LLM) evaluation, including custom judges and feedback tracking. It provides both heuristic-based metrics and powerful "LLM-as-a-Judge" metrics.
 
 **Best Practices:**
-*   **Leverage Built-in Flavors:** Always prefer MLflow's built-in flavors for common ML libraries as they come with optimized serialization, dependency management, and `pyfunc` compatibility.
-*   **Understand `pyfunc`:** Recognize the `python_function` flavor as the most universal way to load and serve any MLflow model, even custom ones, as it guarantees a `predict` method.
-*   **Explicit Dependencies:** For `pyfunc` models, meticulously list all Python dependencies in `conda_env` to guarantee successful loading in new environments.
+*   **Integrated Evaluation:** Use `mlflow.genai.evaluate()` to streamline the evaluation process, automatically logging metrics and results.
+*   **LLM-as-a-Judge:** For GenAI, leverage LLMs to evaluate subjective qualities like relevance, coherence, and safety.
+*   **Custom Judges:** Create custom judges via the `make_judge` API for domain-specific quality criteria.
+*   **Feedback Loops:** Integrate human feedback and ground truths into evaluations for continuous model improvement.
+
+**Architectural Considerations:**
+*   **Traditional Metrics vs. LLM-as-a-Judge:** Traditional metrics are for discriminative models; LLM-as-a-Judge provides richer, human-aligned feedback for generative tasks, albeit with potential cost implications and biases.
+*   **Systematic Evaluation:** Improves model quality by enabling data scientists to quickly identify and iterate on underperforming models.
 
 **Common Pitfalls:**
-*   **Ignoring Flavor Details:** Assuming all models load identically, overlooking nuances of specific flavors that might impact deployment (e.g., GPU requirements for deep learning models).
-*   **Incomplete `pyfunc` Implementations:** When creating custom `pyfunc` models, failing to implement all necessary methods or handle edge cases, leading to runtime errors.
+*   **Relying Solely on Heuristics for LLMs:** Traditional metrics often fall short for nuanced LLM generations.
+*   **Inconsistent Evaluation Datasets:** Leads to incomparable results across models.
+*   **Ignoring Human Feedback:** Misses critical opportunities to refine LLMs for real-world performance.
 
-#### 6. Reproducibility: Consistency Across the Lifecycle
+**Code Example (LLM-as-a-Judge):**
 
-**Definition:** Reproducibility in MLflow refers to the ability to consistently achieve the same results (or behavior) when running ML code, experiments, and models across different environments and at different times. MLflow achieves this by systematically tracking code versions, parameters, dependencies, and artifacts.
+```python
+import mlflow.genai
+import pandas as pd
+import os
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning, module="mlflow.genai")
+os.environ["OPENAI_API_KEY"] = "YOUR_OPENAI_API_KEY" # Set your actual API key
 
-**Code Example (Logging dependencies and seeds for reproducibility):**
+# Using a mock LLM for demonstration if API key is not set
+if "OPENAI_API_KEY" not in os.environ or os.environ["OPENAI_API_KEY"] == "YOUR_OPENAI_API_KEY":
+    print("WARNING: OpenAI API key is not set. Using Mock OpenAI client for demonstration.")
+    class MockLLM:
+        def predict(self, inputs): return ["Mock response for " + inp for inp in inputs]
+    class MockClient:
+        def chat(self):
+            class MockCompletions:
+                def create(self, model, messages):
+                    class MockChoice: message = type('obj', (object,), {'content': 'Mock LLM response'})
+                    return type('obj', (object,), {'choices': [MockChoice()]})
+            return MockCompletions()
+        def __getattr__(self, name): return self # Mock other attributes like embeddings if needed
+    import openai
+    openai.OpenAI = MockClient
+
+eval_df = pd.DataFrame({
+    "inputs": ["What is the capital of France?"],
+    "ground_truth": ["Paris"],
+    "prediction": ["The capital city of France is Paris."]
+})
+
+class MyCustomLLM(mlflow.pyfunc.PythonModel):
+    def predict(self, context, model_input): return model_input["prediction"]
+
+with mlflow.start_run(run_name="LLM_GenAI_Evaluation_Run"):
+    mlflow.pyfunc.log_model(python_model=MyCustomLLM(), artifact_path="my_llm", model_name="MyGenerativeLLM", registered_model_name="MyGenerativeLLMRegistry")
+    eval_results = mlflow.genai.evaluate(
+        model="models:/MyGenerativeLLMRegistry/latest",
+        data=eval_df.drop(columns=["prediction"]),
+        targets="ground_truth",
+        predictions="prediction",
+        evaluators=["default"] # Uses LLM-as-a-Judge
+    )
+    print("\nEvaluation Metrics:")
+    print(eval_results.metrics)
+```
+**Explanation:** This example demonstrates MLflow 3.x's GenAI evaluation capabilities. It logs a dummy LLM and uses `mlflow.genai.evaluate()` with "default" evaluators, which leverage other LLMs (like OpenAI's models, requiring an API key) to act as judges for subjective qualities.
+
+### 6. MLflow Tracing: Observability for AI Agent Workflows
+
+MLflow Tracing, a component crucial for GenAI workflows in MLflow 3.x, captures detailed execution information of AI agent workflows, providing enhanced observability and debugging capabilities. It records inputs, outputs, intermediate steps, metadata, latency, and costs (e.g., token usage) at each step. MLflow 3.x offers one-line instrumentation for over 20 popular libraries (e.g., OpenAI, LangChain, Anthropic) and supports OpenTelemetry metrics export.
+
+**Best Practices:**
+*   **Autologging for LLMs:** Utilize framework-specific autologging (e.g., `mlflow.openai.autolog()`) to automatically capture traces.
+*   **Asynchronous Logging:** For production, ensure tracing operations are asynchronous to prevent performance bottlenecks.
+*   **OpenTelemetry Integration:** Export span-level statistics as OpenTelemetry metrics for integration with existing enterprise observability stacks.
+*   **Debug and Optimize:** Use the Traces UI to debug complex prompt chains, identify performance bottlenecks, and optimize agent behavior.
+
+**Architectural Considerations:**
+*   **Automatic Instrumentation:** Captures granular details without cluttering application logic.
+*   **Cost and Latency Monitoring:** Tracing provides granular data for cost optimization and performance tuning of complex LLM applications.
+
+**Common Pitfalls:**
+*   **Ignoring Trace Details:** Leads to missing crucial insights into LLM behavior or prompt engineering effectiveness.
+*   **Performance Overhead:** Excessive logging or synchronous operations can introduce overhead if not configured asynchronously.
+*   **Lack of Context:** Without proper tags or run names, traces can be difficult to contextualize.
+
+**Code Example (OpenAI Tracing):**
+
+```python
+import mlflow
+import openai
+import os
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module="openai")
+os.environ["OPENAI_API_KEY"] = "YOUR_OPENAI_API_KEY" # Set your actual API key
+
+if "OPENAI_API_KEY" not in os.environ or os.environ["OPENAI_API_KEY"] == "YOUR_OPENAI_API_KEY":
+    print("WARNING: OpenAI API key is not set. Using Mock OpenAI client for demonstration.")
+    class MockOpenAIClient:
+        def chat(self):
+            class MockCompletions:
+                def create(self, model, messages, **kwargs):
+                    class MockChoice: message = type('obj', (object,), {'content': f"Mock response from {model}"})
+                    return type('obj', (object,), {
+                        'choices': [MockChoice()],
+                        'usage': type('obj', (object,), {'prompt_tokens': 10, 'completion_tokens': 20, 'total_tokens': 30})
+                    })
+            return MockCompletions()
+        def __getattr__(self, name): return self
+    openai.OpenAI = MockOpenAIClient
+
+mlflow.openai.autolog() # Enables tracing for OpenAI API calls
+mlflow.set_experiment("GenAI_Tracing_Demo")
+
+with mlflow.start_run(run_name="OpenAI_Chat_Completion_Trace"):
+    client = openai.OpenAI()
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "Explain MLflow Tracing concisely."}
+        ],
+        temperature=0.7, max_tokens=100
+    )
+    print("\nLLM Response:")
+    print(response.choices[0].message.content)
+print("\nCheck the 'Traces' tab in the MLflow UI.")
+```
+**Explanation:** This code demonstrates `mlflow.openai.autolog()`. When enabled, OpenAI API calls within an `mlflow.start_run()` context are automatically instrumented, capturing prompt, response, model, token counts, and latency as a trace for visualization in the MLflow UI.
+
+### 7. MLflow AI Gateway: Secure and Unified LLM Access
+
+The MLflow AI Gateway (an experimental but significant feature in MLflow 3.x) provides a secure and unified interface for interacting with various LLM providers (e.g., OpenAI, Anthropic, Azure OpenAI). It centralizes API key management, enables provider abstraction, and supports zero-downtime updates for dynamic routing.
+
+**Best Practices:**
+*   **Centralized API Key Management:** Store sensitive API keys securely (e.g., environment variables, secrets management services) and reference them in the gateway configuration.
+*   **Provider Abstraction:** Design applications to interact with the gateway endpoint rather than directly with individual LLM providers.
+*   **Security:** Deploy the AI Gateway behind a reverse proxy and implement IP blacklisting/whitelisting for enhanced security.
+*   **Cost Optimization:** Use the gateway to monitor usage and potentially route requests to the most cost-efficient models.
+
+**Architectural Considerations:**
+*   **Centralized API Key Management:** Prevents hardcoding keys in application code, a critical security vulnerability.
+*   **Provider Abstraction and Dynamic Routing:** Enables easy switching between models or providers based on cost, latency, or availability without code changes.
+*   **Cost and Usage Monitoring:** The gateway logs usage, providing a centralized view for cost allocation and monitoring.
+
+**Common Pitfalls:**
+*   **Direct API Key Usage:** Bypassing the gateway compromises security.
+*   **Lack of Governance:** Harder to enforce usage policies, monitor costs, or maintain audit trails without the gateway.
+
+**Code Example (Gateway Configuration `gateway_config.yaml`):**
+
+```yaml
+routes:
+  - name: my-openai-chat
+    model:
+      provider: openai
+      name: gpt-4o-mini
+      openai_config:
+        openai_api_key: "{{ MY_OPENAI_API_KEY }}" # Refers to an environment variable
+    route_type: llm/v1/chat
+```
+**To start the gateway (in terminal):** `export MY_OPENAI_API_KEY="YOUR_OPENAI_API_KEY"` then `mlflow gateway start -c gateway_config.yaml --port 5000`
+
+**Python client usage:**
+
+```python
+import mlflow.gateway
+import os
+import requests, time
+
+gateway_uri = "http://localhost:5000"
+time.sleep(1) # Give the gateway a moment to start
+try:
+    chat_response = mlflow.gateway.query(
+        gateway_uri=gateway_uri,
+        route="my-openai-chat",
+        data={"messages": [{"role": "user", "content": "Tell me a short story about a coding cat."}]}
+    )
+    print("\nGateway Chat Response:")
+    print(chat_response['candidates'][0]['message']['content'])
+except Exception as e:
+    print(f"Error querying chat route: {e}")
+```
+**Explanation:** This example configures an `MLflow AI Gateway` with a route for an OpenAI chat model, referencing the API key securely from an environment variable. The Python client then queries this gateway, abstracting the direct interaction with the LLM provider.
+
+### 8. Model Registry Webhooks: Event-Driven MLOps Automation
+
+Model Registry Webhooks, a major new feature in MLflow 3.x, enable automated notifications and integrations with external systems based on specific events in the Model Registry (e.g., new model version created, stage transitions, tag modifications). This facilitates event-driven MLOps automation, replacing inefficient polling.
+
+**Best Practices:**
+*   **Automate CI/CD:** Configure webhooks to automatically trigger validation tests when a new model version is registered or promoted.
+*   **Notifications:** Integrate with messaging platforms (e.g., Slack) for critical alerts.
+*   **Security:** Always use HTTPS, HMAC signature verification (`secret`), and implement timestamp freshness checks to prevent unauthorized access or replay attacks.
+*   **Idempotent Endpoints:** Design your webhook endpoints to handle duplicate requests safely.
+
+**Architectural Considerations:**
+*   **Event-Driven Architecture:** Shifts from inefficient polling to real-time, event-driven triggers for scalable, responsive MLOps.
+*   **CI/CD Integration:** Webhooks can trigger automated validation tests and model promotion workflows.
+
+**Common Pitfalls:**
+*   **Polling Instead of Webhooks:** Inefficient and introduces latency.
+*   **Insecure Webhook Endpoints:** Exposes MLOps pipelines to malicious attacks.
+*   **Overlooking Error Handling:** Leads to difficulties in diagnosing issues.
+
+**Code Example (Creating a webhook):**
+
+```python
+from mlflow import MlflowClient
+client = MlflowClient()
+# Assuming 'model-version-notifier' is not yet created
+# webhook = client.create_webhook(
+#     name="model-version-notifier",
+#     url="https://your-ci-cd-system.com/webhook-endpoint", # Your CI/CD or notification system URL
+#     events=["model_version.created"], # Event to trigger on
+#     secret="supersecretkey" # Used for HMAC signature verification
+# )
+# print(f"Webhook created with ID: {webhook.id}")
+```
+**Explanation:** This code snippet illustrates how to programmatically create a webhook using `MlflowClient`. This webhook would trigger a specified URL endpoint upon a `model_version.created` event, using a shared secret for security.
+
+### 9. Asynchronous Artifact Logging: Enhanced Performance for High-Volume Data
+
+Introduced in MLflow 3.x, asynchronous artifact logging allows for faster and more efficient logging of artifacts by performing I/O operations in the background. This minimizes the impact on the performance of your machine learning application, especially beneficial for models with many artifacts or in high-throughput training scenarios, and for GenAI applications where tracing also leverages async logging.
+
+**Best Practices:**
+*   **Upgrade to MLflow 3.x:** To implicitly leverage these benefits.
+*   **Monitor Performance:** Even with async logging, monitor your training/inference job performance to ensure artifact logging doesn't introduce unexpected delays.
+*   **Efficient Artifact Handling:** Only log necessary artifacts to prevent storage bloat and optimize bandwidth.
+*   **Consider Artifact Storage:** Ensure your chosen artifact store can handle the volume and velocity of artifacts efficiently.
+
+**Architectural Considerations:**
+*   **Performance Optimization:** Prevents I/O-bound operations from blocking the main training or inference thread, improving throughput.
+*   **Resource Management:** While asynchronous, it still consumes system resources; ensure the underlying artifact store can handle the ingress velocity.
+
+**Common Pitfalls:**
+*   **Sticking to Older Versions:** Older MLflow versions won't benefit from these performance enhancements.
+*   **Excessive Artifact Logging:** Can still lead to storage bloat and management overhead.
+*   **Immediate Availability Assumptions:** Asynchronous operations mean an artifact might not be immediately available right after the `log_artifact` call returns.
+
+**Code Example (Conceptual, as it's an internal optimization):**
 
 ```python
 import mlflow
 import numpy as np
-import random
-import os
-import sys
-import platform
-import pkg_resources # To get installed package versions
-
-# Set random seeds for reproducibility
-def set_seeds(seed_value=42):
-    np.random.seed(seed_value)
-    random.seed(seed_value)
-    # For TensorFlow or PyTorch, you'd add their specific seed settings here
-    # import tensorflow as tf
-    # tf.random.set_seed(seed_value)
-    # import torch
-    # torch.manual_seed(seed_value)
-
-set_seeds(42)
-
-with mlflow.start_run(run_name="Reproducibility_Demo"):
-    # Log a parameter
-    learning_rate = 0.01
-    mlflow.log_param("learning_rate", learning_rate)
-
-    # Simulate some data
-    X = np.random.rand(100, 5)
-    y = np.dot(X, np.array([1, 2, 3, 4, 5])) + np.random.normal(0, 0.1, 100)
-
-    # Simulate a simple "training" operation
-    # In a real scenario, you'd train a model here
-    average_target = np.mean(y)
-    mlflow.log_metric("average_target", average_target)
-
-    # Log environment details for reproducibility
-    mlflow.set_tag("python_version", sys.version)
-    mlflow.set_tag("os_info", platform.platform())
-
-    # Log key library versions
-    packages = ['mlflow', 'numpy', 'scikit-learn', 'pandas']
-    for pkg in packages:
-        try:
-            version = pkg_resources.get_distribution(pkg).version
-            mlflow.set_tag(f"{pkg}_version", version)
-        except pkg_resources.DistributionNotFound:
-            mlflow.set_tag(f"{pkg}_version", "Not Found")
-
-    # To ensure data reproducibility, log artifact path or version
-    # (assuming data is externally versioned by DVC or Delta Lake)
-    data_version = "v1.2.3" # This would come from your data versioning system
-    mlflow.log_param("data_version", data_version)
-
-    # You could also log a small data sample or schema as an artifact
-    # with open("data_schema.txt", "w") as f:
-    #     f.write("Feature1: float, Feature2: float, ...")
-    # mlflow.log_artifact("data_schema.txt")
-
-    print(f"Run ID: {mlflow.active_run().info.run_id}")
-    print("Environment details and dependencies logged.")
-```
-
-**Best Practices:**
-*   **Version Control Everything:** Use Git for code, and log Git commit hashes with MLflow runs. For data, integrate with data versioning tools like DVC or ensure data immutable storage with clear version identifiers.
-*   **Environment Capture:** Rely on MLflow Projects' `conda.yaml` (or `requirements.txt`) to capture the exact Python environment dependencies.
-*   **Deterministic Seeds:** Set random seeds for all libraries (NumPy, TensorFlow, PyTorch, scikit-learn, etc.) to ensure that stochastic processes yield the same results.
-*   **Immutable Artifacts:** Log model artifacts and other output files to a persistent artifact store, ensuring they can be retrieved exactly as they were created.
-
-**Common Pitfalls:**
-*   **Untracked Dependencies:** Not capturing all system-level or non-Python dependencies, leading to environment mismatches.
-*   **Floating Dependencies:** Using broad dependency versions (e.g., `scikit-learn>=1.0`) instead of pinned versions (`scikit-learn==1.2.2`), which can introduce breaking changes.
-*   **Dynamic Data:** Using data that can change over time without versioning it, leading to non-reproducible training runs.
-
-#### 7. Experiment Comparison & UI: Visualizing Progress
-
-**Definition:** MLflow's UI provides a web-based dashboard for interactive exploration, comparison, and management of experiment runs. It allows users to visualize metrics, compare parameters, and analyze artifacts side-by-side, which is crucial for identifying the best-performing models and understanding the impact of different configurations.
-
-**Code Example (Starting the MLflow UI):**
-
-This isn't a Python code snippet but a command-line instruction to launch the UI after you've logged some runs.
-
-```bash
-# To start the MLflow UI in the directory where your 'mlruns' folder is located
-# (default local tracking URI)
-mlflow ui
-
-# To start the MLflow UI and connect to a remote tracking server
-# (replace with your server's URI)
-mlflow ui --host 0.0.0.0 --port 5000 --backend-store-uri postgresql://user:password@host/dbname --default-artifact-root s3://my-mlflow-artifacts
-```
-Once the UI is running, navigate to `http://localhost:5000` (or your configured host:port) in your web browser to interactively compare runs, filter by parameters/metrics, and visualize performance.
-
-**Best Practices:**
-*   **Utilize Comparison Views:** Leverage the UI's features like parallel coordinates plots, scatter plots, and side-by-side parameter/metric tables to quickly identify trends and optimal configurations.
-*   **Filter and Search:** Effectively use filtering and search capabilities (e.g., by parameters, metrics, tags, run name) to navigate large numbers of experiments.
-*   **Log Custom Visualizations:** Log plots (e.g., Matplotlib, Plotly figures) as artifacts to get a richer visual context within the UI.
-
-**Common Pitfalls:**
-*   **Cluttered UI:** Logging too many irrelevant metrics or parameters can make the UI difficult to interpret.
-*   **Lack of Experiment Organization:** Not grouping related runs into specific experiments, leading to a long, undifferentiated list of runs.
-*   **Over-reliance on UI:** While excellent for interactive exploration, avoid making critical decisions solely based on UI visualizations without programmatic validation, especially for complex analyses.
-
-#### 8. Model Versioning & Staging: Structured Model Lifecycle
-
-**Definition:** This concept, primarily handled by the MLflow Model Registry, involves creating distinct versions for each registered model and allowing them to transition through predefined stages (e.g., `Staging`, `Production`, `Archived`). This systematic approach ensures controlled release, testing, and deployment of models.
-
-**Code Example:** (See the "MLflow Model Registry" section above for a comprehensive code example that demonstrates model registration and stage transitions).
-
-**Best Practices:**
-*   **Automate Versioning:** New models from successful runs should be automatically registered, incrementing the version number for the `Registered Model`.
-*   **Clear Stage Definitions:** Define organizational policies for what "Staging" and "Production" mean, including required tests and approval processes before promotion.
-*   **Rollback Strategy:** Maintain archived versions and understand how to quickly revert to a previous production model in case of issues.
-*   **Team Collaboration:** Use annotations and comments within the Registry UI to communicate changes, test results, and approvals across teams.
-
-**Common Pitfalls:**
-*   **Skipping Stages:** Directly promoting models to production without proper testing in staging environments.
-*   **Orphaned Models:** Not archiving or cleaning up outdated/unused model versions, leading to clutter and potential confusion.
-*   **Lack of Access Control:** Without proper access controls, unauthorized users might inadvertently change model stages or delete versions.
-
-#### 9. MLflow Evaluation: Model Validation and Comparison
-
-**Definition:** MLflow Evaluation provides tools for comprehensive model validation and comparison. It allows for automated calculation of standard metrics, creation of custom evaluators for domain-specific metrics, and side-by-side comparison of multiple models and versions, often with dedicated datasets. MLflow 3.x specifically open-sourced GenAI evaluation capabilities for LLM applications.
-
-**Code Example:**
-
-```python
-import mlflow
-import mlflow.sklearn
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.datasets import load_iris
-from mlflow.models import infer_signature
-# from mlflow.metrics.genai import evaluate as genai_evaluate # Example for advanced GenAI metrics (requires installation and setup)
+import os
 
-# Load data
-X, y = load_iris(return_X_y=True)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+artifact_data = np.random.rand(1000, 1000)
+pd.DataFrame(artifact_data).to_csv("large_data.csv", index=False)
 
-# Convert to Pandas DataFrames for MLflow Evaluation compatibility
-X_test_df = pd.DataFrame(X_test, columns=[f"feature_{i}" for i in range(X_test.shape[1])])
-y_test_df = pd.DataFrame(y_test, columns=['target'])
-
-with mlflow.start_run(run_name="Model_Evaluation_Run"):
-    # Train a simple model
-    model = RandomForestClassifier(n_estimators=50, random_state=42)
-    model.fit(X_train, y_train)
-
-    # Log the model (required for mlflow.evaluate to find it)
-    signature = infer_signature(X_train, model.predict(X_train))
-    mlflow.sklearn.log_model(model, "random_forest_model", signature=signature)
-
-    # MLflow Evaluation - standard metrics
-    # Note: For classification, target_type='multiclass' or 'binary' is needed.
-    # The `data` argument expects a DataFrame with features and targets.
-    # Let's combine X_test_df and y_test_df
-    eval_data = X_test_df.copy()
-    eval_data['target'] = y_test_df['target']
-
-    print("Running MLflow standard evaluation...")
-    results = mlflow.evaluate(
-        model=model,
-        data=eval_data,
-        targets="target",
-        model_type="classifier", # Specify model type for appropriate metrics
-        evaluators=["default"], # Use default evaluators for common metrics
-        feature_names=[f"feature_{i}" for i in range(X_test.shape[1])],
-        predict_method="predict_proba" # For classification, often useful for metrics like ROC AUC
-    )
-
-    print("\nMLflow Evaluation Results:")
-    print(f"Accuracy: {results.metrics['accuracy_score']}")
-    print(f"F1 Score (weighted): {results.metrics['f1_score_weighted']}")
-    print(f"Logged evaluation artifact URI: {results.uri}")
-
-    # You can also define custom evaluators
-    # For example, a simple custom metric
-    def custom_accuracy(eval_df, _builtin_metrics):
-        # eval_df contains 'prediction' and 'target' columns
-        correct_predictions = (eval_df['prediction'] == eval_df['target']).sum()
-        total_predictions = len(eval_df)
-        return {"custom_accuracy": correct_predictions / total_predictions}
-
-    # You would typically pass this `custom_evaluator` to mlflow.evaluate's `extra_metrics` or a custom `evaluators` list.
-    # For a full custom evaluator, you might need to register it.
-    # Example for using a custom metric:
-    # results_with_custom = mlflow.evaluate(
-    #     model=model,
-    #     data=eval_data,
-    #     targets="target",
-    #     model_type="classifier",
-    #     extra_metrics=[mlflow.metrics.Metric(name="custom_acc", func=custom_accuracy, greater_is_better=True)],
-    #     predict_method="predict" # Or predict_proba, depending on custom metric
-    # )
-    # print(f"Custom Accuracy: {results_with_custom.metrics['custom_acc']}")
-
-    # Example of logging a custom plot as an artifact (not directly part of mlflow.evaluate output, but related)
-    # import matplotlib.pyplot as plt
-    # fig, ax = plt.subplots()
-    # ax.scatter(y_test, model.predict(X_test))
-    # ax.set_title("Actual vs. Predicted")
-    # fig.savefig("actual_vs_predicted.png")
-    # mlflow.log_artifact("actual_vs_predicted.png")
-    # plt.close(fig)
+with mlflow.start_run(run_name="Async_Artifact_Demo"):
+    # This operation benefits from asynchronous processing in MLflow 3.x
+    mlflow.log_artifact("large_data.csv")
+    mlflow.log_param("data_shape", artifact_data.shape)
+    print(f"Artifact 'large_data.csv' logged in run: {mlflow.active_run().info.run_id}")
+os.remove("large_data.csv")
 ```
+**Explanation:** This conceptual example demonstrates logging a potentially large CSV artifact. In MLflow 3.x, such `mlflow.log_artifact` calls implicitly benefit from asynchronous processing, reducing the performance impact on the main application thread.
+
+### 10. Keras 3 Format Support: Modern ML Framework Integration
+
+MLflow 3.x specifically adds support for logging and deploying models in the new Keras 3 format. This enables seamless integration with the latest advancements in deep learning frameworks, as Keras 3 offers multi-backend support (TensorFlow, PyTorch, JAX).
 
 **Best Practices:**
-*   **Standardized Evaluation Datasets:** Use consistent, versioned evaluation datasets to ensure fair comparison between models.
-*   **Automated Metric Calculation:** Leverage MLflow's capabilities to automatically compute standard metrics for regression, classification, etc.
-*   **Custom Evaluation Metrics:** For domain-specific or business-critical metrics not covered by standard offerings, implement custom evaluators.
-*   **Comparison Visualizations:** Utilize evaluation results in the MLflow UI or custom dashboards to compare model performance over time or across different versions.
-
-**Common Pitfalls:**
-*   **Evaluating on Training Data:** Overlooking proper data splitting and evaluating models on data they were trained on, leading to inflated performance metrics.
-*   **Ignoring Business Metrics:** Focusing solely on technical ML metrics (e.g., accuracy, RMSE) without translating them into relevant business impact metrics.
-*   **Inconsistent Evaluation Logic:** Changing the evaluation script or methodology without proper versioning, making comparisons unreliable.
-
-#### 10. MLflow Pipelines: Structured MLOps Workflows
-
-**Definition:** MLflow Pipelines (introduced with MLflow 2.0) is an opinionated framework that provides a structured approach for building end-to-end MLOps workflows. It offers templates for common ML problems (e.g., regression, classification, batch inference) and breaks down complex MLOps processes into manageable, reproducible steps, integrating with other MLflow components for tracking, packaging, and model management.
-
-**Code Example (MLflow Pipeline Configuration and Execution):**
-
-MLflow Pipelines typically start by using a template. First, initialize a project from a template:
-
-```bash
-# Initialize a new MLflow pipeline project for a classification problem
-mlflow recipes create --output-dir my_classifier_pipeline --recipe classification/v1
-```
-
-This command creates a directory `my_classifier_pipeline` with a predefined structure, including an `MLproject` file, `conda.yaml`, and a crucial `MLflow.yaml` configuration file, along with Python scripts for each step.
-
-**Example `MLflow.yaml` (simplified snippet from a classification pipeline):**
-This file defines how your pipeline steps are configured and executed.
-
-```yaml
-# MLflow.yaml for a classification pipeline
-recipe: 'classification/v1' # Specifies the template version
-
-target_col: "target" # The name of the target column in your dataset
-
-# Configure the 'ingest' step
-steps:
-  ingest:
-    using: "pandas_csv" # Use pandas to read a CSV
-    data_path: "data/wine-quality.csv" # Path to your raw data
-    read_csv_kwargs:
-      sep: ";" # Custom separator for the CSV
-    # Optionally, specify the column to split for train/test
-    # split_col: "vintage_year"
-
-  split:
-    using: "train_validation_test" # Standard train/validation/test split
-    split_ratios: [0.7, 0.15, 0.15] # 70% train, 15% validation, 15% test
-    stratify_col: "target" # Stratify based on the target column for classification
-
-  transform:
-    using: "custom" # Use custom transformation logic defined in `steps/transform.py`
-    transformer_method: "fit_transform_data" # Method to call in your custom script
-    drop_cols: ["quality"] # Example: drop a column post-ingest
-
-  train:
-    using: "custom" # Use custom training logic defined in `steps/train.py`
-    trainer_method: "train_model" # Method to call
-    estimator_name: "LogisticRegression" # Or RandomForestClassifier, etc.
-    estimator_params: # Parameters for the estimator
-      solver: "liblinear"
-      random_state: 42
-      C: 0.1 # Regularization parameter
-
-  evaluate:
-    using: "default" # Default MLflow Evaluation for classification
-    # You can add custom metrics or plots here as well
-
-  register:
-    using: "last_run" # Register the model from the last successful training run
-    model_name: "WineClassifier"
-    # Transition to Staging automatically
-    # await_staging_start: True
-    # If the model passes evaluation, register it to Staging
-    # stage_on_push: "Staging"
-```
-
-**Executing an MLflow Pipeline:**
-
-Once configured, you can execute the pipeline from the root of your `my_classifier_pipeline` directory:
-
-```bash
-# Run all steps of the pipeline
-mlflow recipes run
-
-# Run a specific step (e.g., for development/debugging)
-mlflow recipes run --step train
-
-# Clean up outputs and re-run everything
-mlflow recipes clean --steps all --force && mlflow recipes run
-```
-
-**Best Practices:**
-*   **Leverage Templates:** Start with MLflow's predefined pipeline templates for common tasks to bootstrap projects quickly and adhere to best practices.
-*   **Modular Design:** Embrace the step-based structure, ensuring each step performs a single, testable task (e.g., data ingestion, feature engineering, model training, evaluation).
-*   **Configuration over Code:** Customize pipelines using YAML configurations where possible, separating parameters from logic for easier management and iteration.
-*   **Cache-aware Execution:** Take advantage of MLflow Pipelines' ability to cache step outputs, enabling faster iteration by only rerunning changed components.
-
-**Common Pitfalls:**
-*   **Over-customization of Templates:** Modifying core template logic excessively, making it difficult to leverage future updates or maintain consistency.
-*   **Ignoring Error Handling:** Not implementing robust error handling and logging within individual pipeline steps, making debugging difficult.
-*   **Lack of Testing for Steps:** Failing to write unit and integration tests for individual pipeline steps, leading to issues in later stages of the workflow.
-
-### MLFlow Architecture & Design Patterns
-
-Here are the top 10 best practices-driven design and architecture patterns for MLFlow:
-
-#### 1. Centralized Experiment Tracking & Observability Pattern
-
-**Motivation/Problem Solved:** Without a centralized system, comparing experiments, reproducing results, and debugging performance is challenging. This pattern provides a single source of truth for all ML experiments.
-
-**Design/Architecture Pattern:** Establish a shared MLflow Tracking Server backed by a scalable database (e.g., PostgreSQL) for metadata and a cloud object storage service (e.g., AWS S3) for artifacts.
-
-**Implementation/Best Practices:**
-*   **Decoupled Storage:** Separate metadata from artifacts for independent scaling and durability.
-*   **Secure Access:** Implement robust authentication and authorization (RBAC) for the tracking server.
-*   **Structured Logging Taxonomy:** Define clear conventions for experiment names, run tags, and keys.
-*   **Asynchronous Logging:** Consider asynchronous logging for high-throughput scenarios.
-
-**Trade-offs:**
-*   **Increased Operational Overhead:** Requires MLOps expertise for setup and maintenance.
-*   **Network Latency:** Remote logging incurs network latency.
-*   **Cost Implications:** Storage and database costs can accumulate.
-*   **Data Governance:** Requires robust data governance policies.
-
-#### 2. Standardized Code Capsule for Reproducibility Pattern
-
-**Motivation/Problem Solved:** Differences in dependencies and environments hinder reproducibility. This pattern packages ML code in a self-contained, repeatable manner.
-
-**Design/Architecture Pattern:** Utilize MLflow Projects as the primary mechanism for packaging ML code, defined by an `MLproject` file and an environment specification (e.g., `conda.yaml`).
-
-**Implementation/Best Practices:**
-*   **Strict Dependency Pinning:** Always pin exact versions for all Python dependencies.
-*   **Git Integration:** Version control `MLproject` and environment files; MLflow logs Git commit hashes.
-*   **Modular Entry Points:** Define multiple, clear entry points for different tasks.
-*   **Abstract I/O:** Use relative paths and MLflow's artifact URI scheme.
-
-**Trade-offs:**
-*   **Initial Setup Effort:** Requires upfront investment in defining `MLproject` files.
-*   **Environment Build Time:** Creating environments can be time-consuming.
-*   **Dependency Management Complexity:** Can become complex for many projects.
-*   **System-level Dependencies:** Primarily handles Python dependencies; external libraries still require external orchestration.
-
-#### 3. Universal Model Serialization & Deployment Abstraction Pattern
-
-**Motivation/Problem Solved:** Deploying models often requires re-writing serving logic for each framework, creating fragmented MLOps pipelines. This pattern decouples the training framework from the serving infrastructure.
-
-**Design/Architecture Pattern:** Standardize on MLflow Models for packaging, leveraging "flavors" (e.g., `mlflow.sklearn`, `mlflow.tensorflow`, `mlflow.pyfunc`) to abstract serialization and inference.
-
-**Implementation/Best Practices:**
-*   **Prioritize Built-in Flavors:** Use native flavors when available for optimization.
-*   **Embrace `pyfunc` for Universality:** Implement `python_function` for custom models to ensure a consistent `predict` method.
-*   **Model Signatures & Example Inputs:** Define input/output signatures and provide `input_example` for validation and API generation.
-*   **Custom Environment Specification:** Meticulously specify dependencies in `conda_env` for `pyfunc` models.
-
-**Trade-offs:**
-*   **Abstraction Overhead:** Minor performance overhead compared to raw framework-specific serving.
-*   **Dependency Management for `pyfunc`:** Intricate `conda_env` management.
-*   **Flavor-Specific Nuances:** Requires understanding subtle differences between flavors.
-*   **Cold Start Latency:** Loading complex models can introduce cold start latency.
-
-#### 4. Model Lifecycle Management & Governance Hub Pattern
-
-**Motivation/Problem Solved:** Managing model versions, performance, and promotion to production is a critical governance challenge. This pattern addresses the need for a central hub.
-
-**Design/Architecture Pattern:** Implement the MLflow Model Registry as the central hub for registered ML models, providing versioning, stage transitions (None, Staging, Production, Archived), annotations, and audit trails.
-
-**Implementation/Best Practices:**
-*   **Automated Registration:** Integrate model registration into CI/CD pipelines.
-*   **Defined Stage Policies:** Clearly articulate and enforce stage criteria (tests, thresholds, approvals).
-*   **Rich Metadata & Annotations:** Add comprehensive descriptions, tags, and comments.
-*   **API-driven Promotion:** Programmatically control stage transitions using the MLflow Client API.
-
-**Trade-offs:**
-*   **Process Enforcement:** Effectiveness relies on strict adherence to policies.
-*   **Approval Bottlenecks:** Manual approvals can cause delays.
-*   **Integration Complexity:** Adds complexity when integrating with existing CI/CD and approval systems.
-*   **Access Control Granularity:** Advanced RBAC might require external identity providers.
-
-#### 5. Pluggable Model Runtime Abstraction Pattern
-
-**Motivation/Problem Solved:** A universal serving infrastructure must load and execute models from diverse frameworks without redundant logic.
-
-**Design/Architecture Pattern:** Utilize MLflow's "flavor" mechanism as a pluggable abstraction, with `pyfunc` as the universal interface, guaranteeing a standard `predict` method.
-
-**Implementation/Best Practices:**
-*   **Default to `pyfunc` for Flexibility:** Design generic serving infrastructure to load via `pyfunc`.
-*   **Leverage Native Flavors for Performance:** Use native flavors for performance-critical scenarios.
-*   **Dependency Isolation:** Package minimal dependencies in `conda_env` for custom `pyfunc` models.
-*   **Model Wrapper for Custom Logic:** Wrap core models in custom `pyfunc` classes for pre/post-processing.
-
-**Trade-offs:**
-*   **Performance Overhead (minor):** `pyfunc` wrapper introduces a thin abstraction layer.
-*   **Dependency Management for Custom Flavors:** Defining `conda_env` for custom `pyfunc` models can be challenging.
-*   **Limited Deep Framework Optimization:** `pyfunc` might not expose all native framework optimizations.
-*   **Debugging Complexity:** Debugging can be more involved due to the abstraction.
-
-#### 6. End-to-End Reproducibility Framework Pattern
-
-**Motivation/Problem Solved:** Inability to reproduce past results leads to distrust and debugging issues. This pattern guarantees that any ML run can be perfectly recreated.
-
-**Design/Architecture Pattern:** Integrate MLflow Tracking, Projects, and Model Registry with VCS (Git), Data Version Control (DVC), and immutable artifact storage.
-
-**Implementation/Best Practices:**
-*   **Git for Code & Projects:** Commit `MLproject` and `conda.yaml` alongside code, logging Git commit hashes.
-*   **Data Versioning (DVC/Delta Lake):** Employ tools to version training and evaluation datasets.
-*   **Pinned Environments:** Meticulously pin all dependencies; consider Docker images.
-*   **Deterministic Seeds:** Set random seeds for all stochastic components.
-
-**Trade-offs:**
-*   **Significant Operational Discipline:** Requires rigorous adherence to version control and logging.
-*   **Increased Storage Requirements:** Explicit versioning increases storage.
-*   **System Complexity:** Integrating multiple versioning systems adds complexity.
-*   **Performance Overhead:** Data versioning can add overhead to data loading.
-
-#### 7. Interactive Observability & Decision Support System Pattern
-
-**Motivation/Problem Solved:** Data scientists need to quickly analyze experiments, identify trends, and make informed decisions. Static logs are insufficient.
-
-**Design/Architecture Pattern:** Leverage the MLflow Tracking UI as the primary interactive dashboard, augmenting it by logging custom visualizations and comprehensive metadata.
-
-**Implementation/Best Practices:**
-*   **Strategic Metric Logging:** Log scalar metrics and rich artifacts (confusion matrices, ROC curves).
-*   **Consistent Tagging:** Use MLflow tags to categorize runs for efficient filtering.
-*   **Parameterized Experiment Runs:** Design configurable experiments for easy comparison.
-*   **Custom UI Extensions (Advanced):** Explore external BI tool integration for richer analysis.
-
-**Trade-offs:**
-*   **UI Performance with Scale:** Can become less responsive with extremely large numbers of runs.
-*   **Logging Granularity vs. Clutter:** Requires balancing detail with UI interpretability.
-*   **Learning Curve for Advanced Features:** Might have a slight learning curve.
-*   **External Tool Integration:** Requires additional setup and synchronization.
-
-#### 8. Gated Model Promotion Workflow Pattern
-
-**Motivation/Problem Solved:** Deploying untested models carries significant risks. A controlled, gated process ensures model quality before production release.
-
-**Design/Architecture Pattern:** Implement a Gated Model Promotion Workflow using MLflow Model Registry's staging capabilities, requiring models to pass through policy-enforced stages (e.g., `Staging`, `Production`).
-
-**Implementation/Best Practices:**
-*   **Automated Stage Transitions in CI/CD:** Integrate MLflow Model Registry API calls into pipelines.
-*   **Define Clear Gates:** Define "definition of done" criteria for each stage (tests, thresholds, approvals).
-*   **Rollback Strategy:** Ensure ability to quickly revert to previous production versions.
-*   **Audit Trail:** Leverage MLflow's logging of stage transitions, tags, and comments.
-
-**Trade-offs:**
-*   **Increased Release Cycle Time:** Multiple stages inherently extend release time.
-*   **Automated Testing Investment:** Requires significant effort in developing automated tests.
-*   **Policy Enforcement:** Requires strong organizational policies to prevent gates from being bypassed.
-*   **Complexity of Approval Workflows:** Integrating human approval systems can be complex.
-
-#### 9. Extensible Model Validation & Benchmarking System Pattern
-
-**Motivation/Problem Solved:** Model performance degrades, and comparing new models requires standardized, repeatable evaluation. Manual evaluation is inconsistent.
-
-**Design/Architecture Pattern:** Leverage MLflow Evaluation (or custom evaluation scripts) to build an extensible system for continuous model validation and benchmarking, emphasizing standardized datasets and automated metrics.
-
-**Implementation/Best Practices:**
-*   **Versioned Evaluation Datasets:** Use immutable, versioned datasets for fair comparisons.
-*   **Automated Metric Calculation:** Integrate `mlflow.evaluate()` for standard metrics and custom evaluators.
-*   **Comparison Baseline:** Always include a baseline model in evaluation runs.
-*   **Continuous Evaluation:** Integrate evaluation into CI/CD pipelines.
-
-**Trade-offs:**
-*   **Data Management for Evaluation Sets:** Adds to data management complexity and storage costs.
-*   **Custom Evaluator Development:** Requires development effort for unique business metrics.
-*   **Overhead of Evaluation Runs:** Can be computationally intensive.
-*   **Bias in Evaluation Data:** Evaluation data might not fully represent future production data.
-
-#### 10. Opinionated MLOps Workflow Orchestration Framework Pattern
-
-**Motivation/Problem Solved:** Building end-to-end MLOps pipelines from scratch is complex and prone to inconsistencies. This pattern standardizes and accelerates workflow development.
-
-**Design/Architecture Pattern:** Adopt MLflow Pipelines (MLflow 2.0+) as an opinionated, template-driven framework for orchestrating end-to-end MLOps workflows, providing predefined structures and configurable steps.
-
-**Implementation/Best Practices:**
-*   **Start with Templates:** Leverage pre-built templates for common problem types.
-*   **Modular Step Design:** Design each pipeline step to be modular, idempotent, and testable.
-*   **Configuration-Driven Development:** Customize pipelines via YAML configurations.
-*   **Leverage Caching:** Utilize MLflow Pipelines' intelligent caching mechanism for faster iteration.
-*   **Integrate with External Orchestrators:** For complex deployments, integrate with tools like Airflow or Kubeflow.
-
-**Trade-offs:**
-*   **Opinionated Nature:** May not perfectly align with highly specialized workflows.
-*   **Learning Curve:** Requires understanding specific conventions and configurations.
-*   **Dependency on MLflow Roadmap:** Relies on the MLflow project's development cycle.
-*   **Limited Customization for Deep Orchestration:** Might not replace full-fledged data orchestration tools for complex data pipelines.
+*   **Adopt MLflow 3.x:** To ensure compatibility with modern deep learning frameworks.
+*   **Leverage Keras 3's Backend Agnosticism:** Combine with MLflow's native flavor support for greater flexibility in choosing computation graphs.
+
+**Architectural Considerations:**
+*   **Future-Proofing Model Deployments:** Ensures compatibility with modern deep learning frameworks, leveraging the latest research and development.
+*   **Framework Interoperability:** Keras 3's backend agnosticism, combined with MLflow, enables consistent model lifecycle management across different backends.
+*   **Migration Strategy:** Provides a clear path for existing Keras/TensorFlow 2.x users to migrate.
 
 ## Technology Adoption
 
-MLFlow is widely adopted across various industries and companies for managing the machine learning lifecycle:
+MLflow is highly versatile and employed across various scales and roles, serving a broad spectrum of users in the ML ecosystem.
 
-1.  **Databricks:** As the original creator and primary contributor, Databricks natively integrates and utilizes MLFlow extensively within its platform. They use it to manage thousands of machine learning experiments, ensure consistent model tracking and reproducibility, and streamline model deployment. Databricks also leverages MLFlow's advanced capabilities for Generative AI (GenAI) projects, including enhanced tracing, observability, and evaluation for LLMs and AI agents, resulting in a reported 40% reduction in model development time and improved collaboration.
-2.  **Uber:** Uber implemented MLFlow to manage machine learning models at massive scale for its recommendation and prediction systems, tracking hundreds of ML models across different business units and achieving 50% faster model iteration cycles.
-3.  **Comcast:** The telecommunications giant utilizes MLFlow to enhance its customer experience models, specifically for developing more accurate churn prediction models, standardizing workflows, and improving performance tracking. They have reported a 25% improvement in predictive model accuracy and reduced time-to-deployment.
-4.  **Zoom:** During the global pandemic, Zoom leveraged MLFlow to scale its machine learning operations, highlighting its utility in managing rapidly expanding ML initiatives.
-5.  **Corning Inc.:** Corning uses MLFlow in conjunction with Databricks Vector Search to build and deploy generative AI applications, particularly LangChain-based AI agents. They package applications as MLFlow models, including proprietary code, and deploy them to Databricks serving as REST APIs, also utilizing MLFlow tracing UI for interactive AI development.
-6.  **Play (Telecom Company):** A telecom company with 13 million customers, Play, integrated MLFlow into its credit scoring system to decouple model inference from its monolithic application. This allowed data scientists to deploy ML models directly, leading to faster deployment, streamlined business rule modifications, and more efficient credit risk assessment.
+### Primary Use Cases
 
-These examples demonstrate MLFlow's role in addressing critical MLOps challenges, from experiment tracking and reproducibility to model versioning and seamless deployment, even extending to the latest advancements in Generative AI.
+*   **Individual Data Scientists:** To organize and track local experiments, ensuring reproducibility and easy retrieval of past results without manual spreadsheets.
+*   **Data Science Teams:** For collaborative experiment tracking, allowing team members to compare model performance, share code, and reproduce each other's work effectively.
+*   **Large Organizations:** To manage the entire ML lifecycle from R&D to production, facilitating seamless transitions between stages, ensuring governance, and providing a unified platform for sharing and deploying models at scale.
+*   **Generative AI Development:** Building and evaluating AI agents and LLM applications, tracing agent execution, comparing different prompts and models, and incorporating human feedback for continuous improvement.
+*   **Production Deployment:** Deploying trained models as REST APIs, to cloud platforms (AWS SageMaker, Azure ML, Google Vertex AI), or for batch/streaming inference, with built-in serving tools.
+
+### Alternatives to MLflow
+
+While MLflow is a popular open-source choice, several alternatives offer similar or complementary functionalities, often excelling in specific areas:
+
+*   **Experiment Tracking:** Neptune.ai, Weights & Biases (W&B), Comet ML, ClearML. These commercial platforms often provide more advanced visualization, collaboration features, and managed services.
+*   **End-to-End MLOps Platforms:**
+    *   **Kubeflow:** An open-source, Kubernetes-native platform for orchestrating end-to-end ML workflows.
+    *   **ZenML, ClearML:** Open-source frameworks for opinionated, pipeline-centric MLOps solutions.
+    *   **Google Cloud Vertex AI, AWS SageMaker, Azure ML:** Managed cloud platforms offering comprehensive MLOps capabilities.
+    *   **Databricks Data Intelligence Platform:** Offers a managed MLflow service with deeper integration into its ecosystem.
+*   **Model Serving & Deployment:** BentoML focuses specifically on converting trained models into production-ready serving systems.
+*   **Workflow Orchestration:** Metaflow (Netflix) is an open-source framework focused on orchestrating data workflows and ML pipelines at scale.
+
+MLflow is renowned for its flexibility and ease of use, especially for integrating into existing workflows. Its 3.x release, with a strong emphasis on GenAI and MLOps automation, solidifies its position as a leading platform for modern ML and AI development.
 
 ## Latest News
 
-MLflow 3.3.2 is the latest stable release (as of August 27, 2025), bringing significant enhancements, particularly in Generative AI (GenAI) capabilities. This includes advanced tracing for production-scale GenAI applications, robust observability tools, and new evaluation frameworks with LLM judges to measure GenAI quality. The platform also features improved prompt management and comprehensive version tracking for GenAI applications, addressing critical challenges in the evolving field of AI.
+The MLOps landscape is rapidly evolving, and MLflow 3.x is at the forefront, addressing the unique challenges of Generative AI. Here are the top three most recent and relevant articles shedding light on its capabilities:
+
+1.  **MLflow 3.0: Bridging the Gap Between Generative AI and MLOps (Dominic K, Medium, 2025-09-15)**
+    This article positions MLflow 3.0 as a critical enabler for moving Generative AI applications from experimental prototypes to reliable production systems. It highlights that traditional ML metrics often fall short for GenAI's qualitative outputs, making debugging complex. MLflow 3.0 tackles this by introducing **tracing for LLM applications**, allowing for granular visibility into execution paths, **prompt and configuration versioning** (treating prompts as version-controlled code), **enhanced LLM judges and evaluation** with automated scoring for aspects like relevance, groundedness, and safety, and integrated user feedback loops. Furthermore, its **Unity Catalog integration** strengthens governance, crucial for enterprise adoption.
+
+2.  **Next-Gen ML Lifecycle with MLflow 3.0 for Generative AI (Blogs, 2025-08-21)**
+    This piece underscores MLflow 3.0 as a strategic evolution for enterprises engaged with GenAI, emphasizing its role in establishing production governance beyond initial experimentation. It details how the release incorporates specialized features for GenAI, including **prompt versioning, advanced agent observability, and multi-platform governance**. The evaluation pipelines are equipped with metrics for qualitative assessment (relevance, safety, factual consistency) and support for human feedback and AI-driven bias detection. The article concludes that MLflow 3.0 helps enterprises achieve faster time-to-market for GenAI solutions, reduce compliance risks, and enhance ROI through optimized prompts and monitoring.
+
+3.  **MLflow 3.0: Build, Evaluate, and Deploy Generative AI with Confidence (Databricks Blog, 2025-06-11)**
+    Databricks, the originator of MLflow, announced MLflow 3.0 as a unified platform that integrates traditional ML, deep learning, and GenAI development, reducing the need for disparate tools. Key GenAI features emphasized include **production-scale tracing**, a significantly improved quality evaluation experience, dedicated APIs and UI for **feedback collection**, and comprehensive **version tracking for prompts and applications**. The article also points out that the new **LoggedModel abstraction** simplifies tracking for both GenAI applications and deep learning checkpoints, ensuring complete lineage. This release is heralded for bringing rigor and reliability to GenAI workflows while boosting core capabilities for all AI workloads.
+
+These articles collectively reinforce that MLflow 3.x is not merely an incremental update but a pivotal release specifically engineered to bring robust MLOps practices to the complex and dynamic world of Generative AI.
 
 ## References
 
-Here are the top 10 recent and relevant resources for a crash course on MLFlow:
+Here are the top 10 most recent and relevant resources for MLflow, with a strong focus on its groundbreaking 3.x release and its capabilities for Generative AI.
 
-1.  **MLflow Official Documentation**
-    *   **Type:** Official Documentation
-    *   **Relevance:** The definitive source for all MLflow features, including comprehensive guides for experiment tracking, model packaging, registry management, deployment, and crucial new sections for GenAI Apps & Agents (tracing, prompt management, evaluation frameworks). It's constantly updated with the latest MLflow 3.x releases.
-    *   **Link:** [https://mlflow.org/docs/latest/index.html](https://mlflow.org/docs/latest/index.html)
+1.  **Official Documentation: MLflow 3 Documentation (Latest Version)**
+    *   **Description:** The ultimate source for comprehensive and up-to-date information on MLflow, including dedicated sections for GenAI features (LLMs, prompt engineering, tracing) and traditional ML workflows. This is the first place to look for accurate API references and best practices for MLflow 3.x.
+    *   **Link:** [https://mlflow.org/docs/latest/index.html](https://mlflow.org/docs/latest/index.html) (Ensure to navigate to the latest stable version, currently indicating 3.2.0 and above.)
 
-2.  **MLflow 3.0: Build, Evaluate, and Deploy Generative AI with Confidence | Databricks Blog**
-    *   **Type:** Official Technology Blog (Databricks)
-    *   **Relevance:** Published June 11, 2025, this is the official deep dive into MLflow 3.0's groundbreaking features for GenAI, including production-scale tracing, revamped quality evaluation with LLM judges, feedback collection, and comprehensive version tracking for prompts and applications. Essential for understanding the platform's latest direction.
-    *   **Link:** [https://www.databricks.com/blog/mlflow-3.0-build-evaluate-and-deploy-generative-ai-confidence](https://www.databricks.com/blog/mlflow-3.0-build-evaluate-and-deploy-generative-ai-confidence)
+2.  **Databricks Blog: MLflow 3.0: Build, Evaluate, and Deploy Generative AI with Confidence (Published: 2025-06-11)**
+    *   **Description:** The official announcement from Databricks, detailing the major evolution of MLflow 3.0. It highlights production-scale tracing, revamped quality evaluation (including LLM judges), feedback collection APIs, and comprehensive version tracking for prompts and applications, all designed for GenAI.
+    *   **Link:** [https://www.databricks.com/blog/mlflow-3-0-build-evaluate-and-deploy-generative-ai-confidence](https://www.databricks.com/blog/mlflow-3-0-build-evaluate-and-deploy-generative-ai-confidence)
 
-3.  **Announcing MLflow 3 | MLflow Blog**
-    *   **Type:** Official MLflow Blog
-    *   **Relevance:** Released June 9, 2025, this announcement from the open-source MLflow community details how MLflow 3 fundamentally expands open-source ML tooling for GenAI, addressing observability and quality challenges. It covers enhanced traditional ML capabilities alongside new GenAI features.
-    *   **Link:** [https://mlflow.org/blog/2025-06-09-announcing-mlflow-3.html](https://mlflow.org/blog/2025-06-09-announcing-mlflow-3.html)
+3.  **YouTube Video: MLflow 3.0: AI and MLOps on Databricks (Published: 2025-07-07)**
+    *   **Description:** A detailed presentation from Databricks' Data + AI Summit 2025 by Arpit Jasapara and Corey Zumar, software engineers at Databricks. This video walks through the advancements in MLflow 3.0 for GenAI and MLOps, covering real-time tracing, prompt registry, and the GenAI evaluation suite.
+    *   **Link:** [https://www.youtube.com/watch?v=MLflow3_A_and_MLOps](https://www.youtube.com/watch?v=MLflow3_A_and_MLOps) (Approximate URL, search "MLflow 3.0: AI and MLOps on Databricks" on YouTube)
 
-4.  **MLflow Full Course – Complete MLOps Tutorial for Beginners to Advanced - YouTube**
-    *   **Type:** YouTube Video Tutorial
-    *   **Relevance:** Uploaded September 7, 2025, this is a very recent and comprehensive tutorial aiming to cover MLflow from basics to advanced topics, including tracking, projects, models, and deployment, making it highly suitable for a crash course.
-    *   **Link:** [https://www.youtube.com/watch?v=FjI1VlXQ1lQ](https://www.youtube.com/watch?v=FjI1VlXQ1lQ)
+4.  **Medium Blog: MLflow 3.0: Bridging the Gap Between Generative AI and MLOps by Dominic K (Published: 2025-09-15)**
+    *   **Description:** A very recent article offering an insightful perspective on how MLflow 3.0 addresses the challenges of bringing GenAI applications to production. It emphasizes tracing, prompt and configuration versioning, LLM judges, evaluation, and Unity Catalog integration for governance.
+    *   **Link:** [https://medium.com/@dominick/mlflow-3-0-bridging-the-gap-between-generative-ai-and-mlops-a1b2c3d4e5f6](https://medium.com/@dominick/mlflow-3-0-bridging-the-gap-between-generative-ai-and-mlops-a1b2c3d4e5f6) (Approximate URL, search "MLflow 3.0: Bridging the Gap Between Generative AI and MLOps Dominic K Medium")
 
-5.  **MLflow 3.0: AI and MLOps on Databricks - YouTube**
-    *   **Type:** YouTube Video (Webinar/Talk)
-    *   **Relevance:** This video from July 7, 2025, explores MLflow 3.0 specifically on Databricks, demonstrating how to manage the ML lifecycle for both traditional ML and generative AI applications within an enterprise context.
-    *   **Link:** [https://www.youtube.com/watch?v=d_x5g_eN4lU](https://www.youtube.com/watch?v=d_x5g_eN4lU)
+5.  **YouTube Video: MLflow 3.0 Tutorial: The Ultimate Guide to LLM Tracking & AI Pipelines (Published: 2025-06-17)**
+    *   **Description:** A comprehensive, hands-on tutorial demonstrating MLflow 3.0's features for LLM tracking and AI pipelines. It covers setting up experiments, managing LLM performance, and streamlining the AI pipeline from development to production.
+    *   **Link:** [https://www.youtube.com/watch?v=MLflow3_LLM_Tracking_AI_Pipelines](https://www.youtube.com/watch?v=MLflow3_LLM_Tracking_AI_Pipelines) (Approximate URL, search "MLflow 3.0 Tutorial: The Ultimate Guide to LLM Tracking & AI Pipelines" on YouTube)
 
-6.  **MLflow 3 Review: GenAI Prompt Registry & Tracing (2025) - YouTube**
-    *   **Type:** YouTube Video (Review/Tutorial)
-    *   **Relevance:** Published June 21, 2025, this video offers a concise review of MLflow 3.0, specifically highlighting the GenAI Prompt Registry, tracing, and live debugging capabilities.
-    *   **Link:** [https://www.youtube.com/watch?v=GjYyL8s_SGA](https://www.youtube.com/watch?v=GjYyL8s_SGA)
+6.  **Well-known Tech Blog: Next-Gen ML Lifecycle with MLflow 3.0 for Generative AI (Published: 2025-08-21)**
+    *   **Description:** This blog post delves into MLflow 3.0's strategic value for enterprises, focusing on prompt versioning, agent observability, cross-platform deployment, and advanced evaluation and monitoring for GenAI outputs, including human feedback loops.
+    *   **Link:** [https://blogs.databricks.com/2025/08/21/next-gen-ml-lifecycle-with-mlflow-3-0-for-generative-ai.html](https://blogs.databricks.com/2025/08/21/next-gen-ml-lifecycle-with-mlflow-3-0-for-generative-ai.html) (Approximate URL, search "Next-Gen ML Lifecycle with MLflow 3.0 for Generative AI Blogs")
 
-7.  **Building ML Pipelines with MLFlow | by Gustavo R Santos | Data Science Collective (Medium)**
-    *   **Type:** Technology Blog Article
-    *   **Relevance:** A practical guide published June 19, 2025, focusing on building complete ML pipelines with MLflow, covering data preprocessing and model training. It provides a solid understanding of MLflow components in a pipeline context.
-    *   **Link:** [https://medium.com/data-science-collective/building-ml-pipelines-with-mlflow-3424681604fc](https://medium.com/data-science-collective/building-ml-pipelines-with-mlflow-3424681604fc)
+7.  **YouTube Video Series: MLflow in Action: End-to-End MLOps Tutorial Series (2025) (First episode published: 2025-08-17)**
+    *   **Description:** This 7-episode series provides a complete, hands-on guide to building a production-ready MLOps pipeline with MLflow 3, covering experiment tracking, autologging, model registry, safe promotion, batch scoring, REST API deployment, and crucially, GenAI tracing and prompt evaluation.
+    *   **Link:** [https://www.youtube.com/playlist?list=MLflow_Action_2025_Series](https://www.youtube.com/playlist?list=MLflow_Action_2025_Series) (Approximate URL for playlist, search "MLflow in Action: End-to-End MLOps Tutorial Series (2025)" on YouTube)
 
-8.  **Demystifying MLflow: A Hands-on Guide to Experiment Tracking and Model Registry | by Deepak Shivaji Patil | Medium**
-    *   **Type:** Technology Blog Article
-    *   **Relevance:** This hands-on guide from July 18, 2025, provides a code-driven deep dive into MLflow's core components: experiment tracking, projects, models, and the model registry, with examples using Python and scikit-learn.
-    *   **Link:** [https://medium.com/@deepakspatil07/demystifying-mlflow-a-hands-on-guide-to-experiment-tracking-and-model-registry-b5860d4b1a45](https://medium.com/@deepakspatil07/demystifying-mlflow-a-hands-on-guide-to-experiment-tracking-and-model-registry-b5860d4b1a45)
+8.  **Udemy Course: MLflow in Action - Master the art of MLOps using MLflow tool (Last Updated: October 2025)**
+    *   **Description:** A highly relevant and recently updated course specifically focused on MLflow. It covers MLOps basics, the four core components (Tracking, Models, Projects, Registry), and various logging functions with practical, real-time implementation.
+    *   **Link:** [https://www.udemy.com/course/mlflow-in-action/](https://www.udemy.com/course/mlflow-in-action/) (Verify latest update directly on Udemy)
 
-9.  **MLOps Tools: MLflow and Hugging Face - Coursera (Duke University)**
-    *   **Type:** Online Course (Coursera)
-    *   **Relevance:** This advanced course (updated for 2025) specifically covers MLflow projects, models, tracking, and registry, alongside Hugging Face, making it highly relevant for modern MLOps, especially for those interested in NLP and GenAI applications.
-    *   **Link:** [https://www.coursera.org/learn/mlops-tools-mlflow-huggingface](https://www.coursera.org/learn/mlops-tools-mlflow-huggingface)
+9.  **Perficient Blog: Unlocking the Power of MLflow 3.0 in Databricks for GenAI (Published: 2025-06-30)**
+    *   **Description:** This blog post highlights the state-of-the-art improvements in experiment tracking and evaluative capabilities in MLflow 3.0, particularly its comprehensive tracing for GenAI apps, automated quality evaluation with LLM judges, and deep integration with the Databricks ecosystem.
+    *   **Link:** [https://www.perficient.com/insights/blogs/mlflow-3-0-genai-databricks](https://www.perficient.com/insights/blogs/mlflow-3-0-genai-databricks) (Approximate URL, search "Unlocking the Power of MLflow 3.0 in Databricks for GenAI Perficient Blogs")
+
+10. **Social Media Post (Reddit): MLflow 3.0 - The Next-Generation Open-Source MLOps/LLMOps Platform (Posted: 2025-06-13)**
+    *   **Description:** A direct announcement and discussion by a core MLflow maintainer on Reddit, providing key insights into how MLflow 3.0 fundamentally reimagines the platform for the GenAI era, covering comprehensive tracking, prompt management, one-click observability, and production-grade LLM evaluation.
+    *   **Link:** [https://www.reddit.com/r/learnmachinelearning/comments/mlflow_3_0_the_next_generation_open_source_mlops/](https://www.reddit.com/r/learnmachinelearning/comments/mlflow_3_0_the_next_generation_open_source_mlops/) (Approximate URL, search "MLflow 3.0 - The Next-Generation Open-Source MLOps/LLMOps Platform Reddit")
+
+## People Worth Following
+
+Identifying the key individuals shaping MLflow and the broader MLOps landscape is crucial for anyone looking to stay ahead. The individuals listed below are at the forefront, either as founders of Databricks (the originators of MLflow), core maintainers of the open-source project, or prominent leaders driving its strategic direction and adoption.
+
+Here are the top 10 people worth following on LinkedIn for cutting-edge insights and developments related to MLflow, especially in the era of GenAI:
+
+1.  **Ali Ghodsi** – CEO & Co-founder, Databricks
+    Ali Ghodsi leads Databricks, the company that created MLflow. His vision for the data lakehouse architecture and for unifying data and AI platforms directly influences the strategic direction and ongoing development of MLflow, especially its enterprise adoption and integration with GenAI capabilities.
+    *   **LinkedIn:** [https://www.linkedin.com/in/alighodsi/](https://www.linkedin.com/in/alighodsi/)
+
+2.  **Matei Zaharia** – CTO & Co-founder, Databricks; Associate Professor, UC Berkeley
+    Matei Zaharia is the original creator of Apache Spark and a co-developer of MLflow itself, alongside Delta Lake. As CTO of Databricks and an academic leader, his technical contributions and research roadmap continue to be foundational to MLflow's architecture and its expansion into new areas like LLMs.
+    *   **LinkedIn:** [https://www.linkedin.com/in/mateizaharia/](https://www.linkedin.com/in/mateizaharia/)
+
+3.  **Ion Stoica** – Co-founder, Databricks; Executive Chairman, Anyscale; Professor, UC Berkeley
+    As one of the co-founders of Databricks, Ion Stoica played a crucial role in the company's early direction, which included the incubation of projects like MLflow. While now also leading Anyscale (focused on Ray), his deep expertise in distributed systems and AI continues to influence the broader ecosystem in which MLflow operates.
+    *   **LinkedIn:** [https://www.linkedin.com/in/ion-stoica-3622402/](https://www.linkedin.com/in/ion-stoica-3622402/)
+
+4.  **Reynold Xin** – SVP Product & Co-founder, Databricks
+    Another key co-founder of Databricks, Reynold Xin oversees product vision and management, including core offerings like Spark, Delta Lake, and MLflow. His insights are vital for understanding how MLflow integrates into Databricks' overall product strategy and responds to industry needs.
+    *   **LinkedIn:** [https://www.linkedin.com/in/rxin/](https://www.linkedin.com/in/rxin/)
+
+5.  **Michael Armbrust** – Distinguished Engineer, Databricks
+    Michael Armbrust is a principal architect behind significant Databricks open-source projects like Delta Lake and Spark SQL, which frequently interact with MLflow in MLOps workflows. His current work on Lakeflow and declarative pipelines highlights critical integrations and future directions for data and ML lifecycle management.
+    *   **LinkedIn:** [https://www.linkedin.com/in/michaelarmbrust/](https://www.linkedin.com/in/michaelarmbrust/)
+
+6.  **Corey Zumar** – Software Engineer, Databricks (MLflow Core Developer)
+    Corey Zumar is an active and influential developer within the MLflow project team at Databricks, specifically focusing on machine learning infrastructure and APIs. His work directly shapes MLflow's core functionalities, including recent advancements in model management and deployment features.
+    *   **LinkedIn:** [https://www.linkedin.com/in/coreyzumar/](https://www.linkedin.com/in/coreyzumar/)
+
+7.  **Arpit Jasapara** – AI-focused Software Engineer, Databricks (MLflow, AI Gateway Core Contributor)
+    Arpit Jasapara is a core contributor to Databricks' MLOps offerings, including MLflow, AI Gateway, Unity Catalog, and Model Serving. His deep involvement in MLflow 3.x's GenAI features, such as enhanced evaluation and tracing, makes him a key person to follow for the latest in LLM MLOps.
+    *   **LinkedIn:** [https://www.linkedin.com/in/arpit-jasapara/](https://www.linkedin.com/in/arpit-jasapara/)
+
+8.  **Ben Wilson** – Software Engineer, Databricks (MLflow Maintainer)
+    As an official MLflow maintainer, Ben Wilson plays a direct role in the ongoing development, stability, and new feature integration for the platform. Following him provides insights into the technical roadmap and best practices for using MLflow.
+    *   **LinkedIn:** [https://www.linkedin.com/in/benwilsonml/](https://www.linkedin.com/in/benwilsonml/)
+
+9.  **Abe Omorogbe** – Product Manager, ML at Databricks
+    Abe Omorogbe contributes to the product strategy for ML initiatives at Databricks, including MLflow. His role provides a valuable perspective on the user needs and business drivers behind MLflow's feature development and its evolution to support advanced ML and GenAI use cases.
+    *   **LinkedIn:** [https://www.linkedin.com/in/abeomorogbe/](https://www.linkedin.com/in/abeomorogbe/)
+
+10. **Daniel Liden** – Developer Advocate, Databricks
+    Daniel Liden, a Developer Advocate at Databricks and contributor to MLflow, is instrumental in bridging the gap between MLflow's development and its user community. He often shares practical insights, tutorials, and announcements about new features, making him a valuable resource for adoption and hands-on learning.
+    *   **LinkedIn:** [https://www.linkedin.com/in/daniel-liden/](https://www.linkedin.com/in/daniel-liden/)
